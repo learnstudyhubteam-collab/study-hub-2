@@ -2,12 +2,34 @@ import { HTMLAttributes } from 'react'
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   padding?: boolean
+  variant?: 'glass' | 'glass-blue' | 'solid'
+  hover?: boolean
 }
 
-export default function Card({ padding = true, className = '', children, ...props }: CardProps) {
+export default function Card({
+  padding = true,
+  variant = 'glass',
+  hover = false,
+  className = '',
+  children,
+  ...props
+}: CardProps) {
+  const base = 'rounded-2xl'
+
+  const variants = {
+    glass: 'glass',
+    'glass-blue': 'glass-blue',
+    solid: 'bg-white/90 border border-gray-100/80 shadow-sm',
+  }
+
   return (
     <div
-      className={`bg-white rounded-2xl border border-gray-100 shadow-sm ${padding ? 'p-6' : ''} ${className}`}
+      className={`
+        ${base}
+        ${hover ? 'glass-card' : variants[variant]}
+        ${padding ? 'p-5' : ''}
+        ${className}
+      `}
       {...props}
     >
       {children}

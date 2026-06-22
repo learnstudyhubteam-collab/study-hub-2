@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Button from '@/components/ui/button'
 
 export default function ManageButton() {
   const [loading, setLoading] = useState(false)
@@ -15,8 +14,12 @@ export default function ManageButton() {
   }
 
   return (
-    <Button variant="secondary" size="sm" onClick={handleManage} loading={loading}>
-      Manage subscription
-    </Button>
+    <button
+      onClick={handleManage}
+      disabled={loading}
+      className="btn-glass text-electric font-semibold text-sm px-4 py-2 rounded-xl disabled:opacity-60"
+    >
+      {loading ? 'Loading…' : 'Manage subscription'}
+    </button>
   )
 }

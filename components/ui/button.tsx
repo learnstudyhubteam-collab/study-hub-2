@@ -7,43 +7,45 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses = {
-  primary: 'bg-brand-600 text-white hover:bg-brand-700 disabled:bg-brand-300',
-  secondary: 'border border-gray-200 text-gray-700 hover:bg-gray-50 disabled:text-gray-400',
-  ghost: 'text-gray-600 hover:bg-gray-100 disabled:text-gray-400',
-  danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
+  primary: 'btn-electric text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed',
+  secondary: 'btn-glass font-medium disabled:opacity-50 disabled:cursor-not-allowed',
+  ghost: 'text-gray-600 hover:text-electric hover:bg-electric/5 active:scale-95 transition-all duration-200 disabled:opacity-40',
+  danger:
+    'bg-gradient-to-br from-red-500 to-red-600 text-white font-semibold shadow-[0_4px_15px_rgba(239,68,68,0.3)] hover:shadow-[0_8px_25px_rgba(239,68,68,0.4)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-200 disabled:opacity-50',
 }
 
 const sizeClasses = {
-  sm: 'px-3 py-1.5 text-sm rounded-lg',
+  sm: 'px-3 py-1.5 text-sm rounded-xl',
   md: 'px-4 py-2.5 text-sm rounded-xl',
-  lg: 'px-6 py-3 text-base rounded-xl',
+  lg: 'px-6 py-3 text-base rounded-2xl',
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    { variant = 'primary', size = 'md', loading, disabled, className = '', children, ...props },
-    ref
-  ) => {
+  ({ variant = 'primary', size = 'md', loading, disabled, className = '', children, ...props }, ref) => {
     return (
       <button
         ref={ref}
         disabled={disabled || loading}
         className={`
-          inline-flex items-center justify-center gap-2 font-medium transition-colors
-          focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2
-          disabled:cursor-not-allowed
+          inline-flex items-center justify-center gap-2
+          focus:outline-none focus-visible:ring-2 focus-visible:ring-electric/50 focus-visible:ring-offset-2
+          select-none
           ${variantClasses[variant]}
           ${sizeClasses[size]}
           ${className}
         `}
         {...props}
       >
-        {loading && (
-          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+        {loading ? (
+          <svg
+            className="animate-spin h-4 w-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
           </svg>
-        )}
+        ) : null}
         {children}
       </button>
     )
