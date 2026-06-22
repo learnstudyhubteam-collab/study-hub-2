@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getUserSubscriptionStatus, isPro } from '@/lib/tier'
 import UpgradeBanner from '@/components/billing/UpgradeBanner'
+import ScrollReveal from '@/components/ui/scroll-reveal'
 import { BookOpen, Layers, Zap, ArrowRight, Clock, ChevronRight } from 'lucide-react'
 import type { StudySession, FlashcardDeck } from '@/types'
 
@@ -67,13 +68,13 @@ export default async function DashboardPage() {
 
       {/* Upgrade banner */}
       {!proUser && (
-        <div className="animate-fade-up delay-100">
+        <ScrollReveal direction="up" delay={80}>
           <UpgradeBanner />
-        </div>
+        </ScrollReveal>
       )}
 
       {/* Quick actions */}
-      <div className="grid sm:grid-cols-3 gap-4 animate-fade-up delay-100">
+      <div className="grid sm:grid-cols-3 gap-4">
         {[
           {
             href: '/study',
@@ -99,11 +100,12 @@ export default async function DashboardPage() {
             title: proUser ? 'Pro plan active' : 'Upgrade to Pro',
             desc: proUser ? 'Advanced Claude Sonnet AI' : 'Unlock Claude Sonnet AI',
           },
-        ].map((action) => {
+        ].map((action, i) => {
           const Icon = action.icon
           return (
-            <Link key={action.href} href={action.href}>
-              <div className="glass-card p-5 h-full group">
+            <ScrollReveal key={action.href} direction="up" delay={i * 80}>
+            <Link href={action.href}>
+              <div className="glass-card p-5 h-full group glow-border">
                 <div className={`w-10 h-10 rounded-xl ${action.bg} ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="w-5 h-5" />
                 </div>
@@ -111,12 +113,14 @@ export default async function DashboardPage() {
                 <p className="text-xs text-gray-500">{action.desc}</p>
               </div>
             </Link>
+            </ScrollReveal>
           )
         })}
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-5 animate-fade-up delay-200">
+      <div className="grid lg:grid-cols-2 gap-5">
         {/* Recent sessions */}
+        <ScrollReveal direction="left" delay={0}>
         <div className="glass rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-gray-900 flex items-center gap-2">
@@ -163,8 +167,10 @@ export default async function DashboardPage() {
             </div>
           )}
         </div>
+        </ScrollReveal>
 
         {/* Flashcard decks */}
+        <ScrollReveal direction="right" delay={100}>
         <div className="glass rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-gray-900 flex items-center gap-2">
@@ -206,6 +212,7 @@ export default async function DashboardPage() {
             </div>
           )}
         </div>
+        </ScrollReveal>
       </div>
     </div>
   )

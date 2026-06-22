@@ -15,10 +15,10 @@ interface ChatInterfaceProps {
 function MessageBubble({ role, content }: { role: string; content: string }) {
   const isUser = role === 'user'
   return (
-    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} group`}>
+    <div className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} group msg-enter`}>
       {/* Avatar */}
       <div
-        className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs shrink-0 transition-transform group-hover:scale-105 ${
+        className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs shrink-0 transition-all duration-200 group-hover:scale-110 group-hover:shadow-electric-lg ${
           isUser
             ? 'bg-electric-gradient shadow-electric'
             : 'glass border border-white/80 shadow-sm'
@@ -38,7 +38,7 @@ function MessageBubble({ role, content }: { role: string; content: string }) {
           transition-all duration-200
           ${isUser
             ? 'btn-electric text-white rounded-tr-sm'
-            : 'glass text-gray-800 rounded-tl-sm'
+            : 'glass text-gray-800 rounded-tl-sm hover:shadow-glass-hover'
           }
         `}
       >
@@ -50,19 +50,15 @@ function MessageBubble({ role, content }: { role: string; content: string }) {
 
 function TypingIndicator() {
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 msg-enter">
       <div className="w-8 h-8 rounded-xl glass border border-white/80 shadow-sm flex items-center justify-center">
-        <Zap className="w-4 h-4 text-electric" fill="currentColor" />
+        <Zap className="w-4 h-4 text-electric animate-pulse" fill="currentColor" />
       </div>
-      <div className="glass px-4 py-3 rounded-2xl rounded-tl-sm">
-        <div className="flex gap-1.5 items-center h-4">
-          {[0, 150, 300].map((delay) => (
-            <span
-              key={delay}
-              className="w-2 h-2 bg-electric/60 rounded-full animate-bounce"
-              style={{ animationDelay: `${delay}ms` }}
-            />
-          ))}
+      <div className="glass px-4 py-3.5 rounded-2xl rounded-tl-sm">
+        <div className="flex gap-1.5 items-end h-4">
+          <span className="w-2 h-2 bg-electric/70 rounded-full typing-dot" />
+          <span className="w-2 h-2 bg-electric/70 rounded-full typing-dot" />
+          <span className="w-2 h-2 bg-electric/70 rounded-full typing-dot" />
         </div>
       </div>
     </div>

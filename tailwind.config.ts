@@ -39,11 +39,18 @@ const config: Config = {
         'fade-in': 'fadeIn 0.4s ease forwards',
         'slide-up': 'slideUp 0.5s ease forwards',
         'float': 'float 6s ease-in-out infinite',
+        'float-slow': 'float 9s ease-in-out infinite',
+        'float-fast': 'float 4s ease-in-out infinite',
         'shimmer': 'shimmer 2s linear infinite',
         'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+        'pulse-ring': 'pulseRingOut 2s ease-out infinite',
         'spin-slow': 'spin 3s linear infinite',
         'liquid': 'liquidBlob 20s ease-in-out infinite',
+        'liquid-alt': 'liquidBlobAlt 25s ease-in-out infinite',
+        'liquid-slow': 'liquidBlobSlow 38s ease-in-out infinite',
         'bounce-gentle': 'bounceGentle 1.4s ease-in-out infinite',
+        'gradient-shift': 'gradientShift 4s ease infinite',
+        'orbit': 'orbitGlow 8s linear infinite',
       },
       keyframes: {
         fadeUp: {
@@ -90,6 +97,14 @@ const config: Config = {
         bounceGentle: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-4px)' },
+        },
+        pulseRingOut: {
+          '0%': { transform: 'scale(1)', opacity: '0.6' },
+          '100%': { transform: 'scale(1.5)', opacity: '0' },
+        },
+        gradientShift: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
         },
       },
       backgroundImage: {
