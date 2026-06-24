@@ -66,3 +66,90 @@ export interface QuizResult {
   is_correct: boolean
   created_at: string
 }
+
+export type AssignmentStatus = 'pending' | 'in_progress' | 'completed' | 'overdue'
+export type AssignmentPriority = 'low' | 'medium' | 'high'
+
+export interface Assignment {
+  id: string
+  user_id: string
+  class_id: string | null
+  title: string
+  description: string | null
+  subject: string | null
+  due_date: string | null
+  status: AssignmentStatus
+  priority: AssignmentPriority
+  grade: number | null
+  max_grade: number | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Exam {
+  id: string
+  user_id: string
+  class_id: string | null
+  title: string
+  subject: string | null
+  exam_date: string
+  notes: string | null
+  created_at: string
+}
+
+export interface GradeEntry {
+  id: string
+  user_id: string
+  class_id: string | null
+  subject: string
+  assignment_name: string
+  score: number
+  max_score: number
+  weight: number
+  category: string | null
+  created_at: string
+}
+
+export interface StudySchedule {
+  id: string
+  user_id: string
+  title: string
+  content: string
+  subjects: string[]
+  exam_date: string | null
+  hours_per_day: number
+  created_at: string
+}
+
+export interface StudyGroup {
+  id: string
+  name: string
+  subject: string | null
+  description: string | null
+  invite_code: string
+  created_by: string
+  created_at: string
+  member_count?: number
+}
+
+export interface StudyGuide {
+  id: string
+  user_id: string
+  class_id: string | null
+  title: string
+  subject: string | null
+  content: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ClassRow {
+  id: string
+  name: string
+  subject: string | null
+  section: string | null
+  description: string | null
+  invite_code: string
+  teacher_id: string
+  created_at: string
+}

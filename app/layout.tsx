@@ -12,11 +12,26 @@ export const metadata: Metadata = {
   title: 'Study Hub — AI-Powered Learning',
   description:
     'Study any subject with an AI tutor. Flashcards, quizzes, step-by-step problem solving, and more.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Study Hub',
+  },
+  formatDetection: { telephone: false },
+  themeColor: '#0066FF',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.variable}>
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Study Hub" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+      </head>
       <body className={`${inter.className} min-h-screen antialiased`}>
         {/* Fixed liquid background — renders on every page */}
         <div className="fixed inset-0 -z-10 overflow-hidden bg-[#F8FBFF]">
