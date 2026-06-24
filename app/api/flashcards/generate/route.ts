@@ -1,19 +1,16 @@
 import { generateText } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { createClient } from '@/lib/supabase/server'
-import { getModelForStatus } from '@/lib/tier'
-import type { SubscriptionStatus } from '@/types'
+import { getModelForPlan, PLAN_LIMITS } from '@/lib/tier'
+import type { SubscriptionPlan } from '@/lib/tier'
 
 export async function POST(req: Request) {
   const { topic, deckId } = await req.json()
 
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) return new Response('Unauthorized', { status: 401 })
 
-  // Verify deck belongs to user
   const { data: deck } = await supabase
     .from('flashcard_decks')
     .select('id')
@@ -23,14 +20,17 @@ export async function POST(req: Request) {
   if (!deck) return new Response('Not found', { status: 404 })
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('subscription_status')
-    .eq('id', user.id)
-    .single()
+    .from('profiles').select('subscription_plan, subscription_status').eq('id', user.id).single()
 
-  const modelId = getModelForStatus(
-    (profile?.subscription_status as SubscriptionStatus) ?? 'free'
-  )
+  const status = profile?.subscription_status ?? 'free'
+  const plan = (status === 'active' ? (profile?.subscription_plan ?? 'free') : 'free') as SubscriptionPlan
+  const limits = PLAN_LIMITS[plan]
+
+  if (!limits.aiFlashcardGen) {
+    return Response.json({ error: 'AI flashcard generation requires a Plus or Pro plan.' }, { status: 403 })
+  }
+
+  const modelId = getModelForPlan(plan)
 
   const { text } = await generateText({
     model: anthropic(modelId),

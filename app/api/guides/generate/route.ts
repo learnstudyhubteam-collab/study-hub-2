@@ -1,8 +1,8 @@
 import { generateText } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { createClient } from '@/lib/supabase/server'
-import { getModelForStatus } from '@/lib/tier'
-import type { SubscriptionStatus } from '@/types'
+import { getModelForPlan, PLAN_LIMITS } from '@/lib/tier'
+import type { SubscriptionPlan } from '@/lib/tier'
 
 export async function POST(req: Request) {
   const { topic, subject, gradeLevel, extraContext } = await req.json()
@@ -12,9 +12,17 @@ export async function POST(req: Request) {
   if (!user) return new Response('Unauthorized', { status: 401 })
 
   const { data: profile } = await supabase
-    .from('profiles').select('subscription_status').eq('id', user.id).single()
+    .from('profiles').select('subscription_plan, subscription_status').eq('id', user.id).single()
 
-  const modelId = getModelForStatus((profile?.subscription_status as SubscriptionStatus) ?? 'free')
+  const status = profile?.subscription_status ?? 'free'
+  const plan = (status === 'active' ? (profile?.subscription_plan ?? 'free') : 'free') as SubscriptionPlan
+  const limits = PLAN_LIMITS[plan]
+
+  if (!limits.aiGuideGen) {
+    return Response.json({ error: 'AI study guide generation requires a Plus or Pro plan.' }, { status: 403 })
+  }
+
+  const modelId = getModelForPlan(plan)
 
   const { text } = await generateText({
     model: anthropic(modelId),

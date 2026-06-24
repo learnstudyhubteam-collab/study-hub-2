@@ -4,6 +4,14 @@ import type Stripe from 'stripe'
 
 export const runtime = 'nodejs'
 
+const PLUS_PRICE_ID = process.env.STRIPE_PRICE_ID_PLUS
+const PRO_PRICE_ID = process.env.STRIPE_PRICE_ID_PRO
+
+function planFromPriceId(priceId: string | null | undefined): 'plus' | 'pro' {
+  if (priceId && PLUS_PRICE_ID && priceId === PLUS_PRICE_ID) return 'plus'
+  return 'pro'
+}
+
 export async function POST(req: Request) {
   const body = await req.text()
   const sig = req.headers.get('stripe-signature')
@@ -19,8 +27,6 @@ export async function POST(req: Request) {
       return new Response('Webhook signature verification failed', { status: 400 })
     }
   } else {
-    // STRIPE_WEBHOOK_SECRET not yet configured — parse without verification
-    // (safe only in development before the secret is wired up)
     if (process.env.NODE_ENV === 'production') {
       console.error('STRIPE_WEBHOOK_SECRET is not set in production')
       return new Response('Webhook secret not configured', { status: 500 })
@@ -30,15 +36,17 @@ export async function POST(req: Request) {
 
   const supabase = await createAdminClient()
 
-  async function updateSubscriptionStatus(
+  async function updateSubscription(
     customerId: string,
     status: string,
+    plan?: 'plus' | 'pro',
     subscriptionId?: string
   ) {
     await supabase
       .from('profiles')
       .update({
         subscription_status: status,
+        subscription_plan: status === 'active' ? (plan ?? 'pro') : 'free',
         stripe_subscription_id: subscriptionId ?? null,
         updated_at: new Date().toISOString(),
       })
@@ -61,20 +69,22 @@ export async function POST(req: Request) {
     case 'customer.subscription.updated': {
       const sub = event.data.object as Stripe.Subscription
       const status = sub.status === 'active' || sub.status === 'trialing' ? 'active' : sub.status
-      await updateSubscriptionStatus(sub.customer as string, status, sub.id)
+      const priceId = sub.items.data[0]?.price?.id
+      const plan = planFromPriceId(priceId)
+      await updateSubscription(sub.customer as string, status, plan, sub.id)
       break
     }
 
     case 'customer.subscription.deleted': {
       const sub = event.data.object as Stripe.Subscription
-      await updateSubscriptionStatus(sub.customer as string, 'canceled', undefined)
+      await updateSubscription(sub.customer as string, 'canceled', undefined, undefined)
       break
     }
 
     case 'invoice.payment_failed': {
       const invoice = event.data.object as Stripe.Invoice
       if (invoice.customer) {
-        await updateSubscriptionStatus(invoice.customer as string, 'past_due')
+        await updateSubscription(invoice.customer as string, 'past_due')
       }
       break
     }

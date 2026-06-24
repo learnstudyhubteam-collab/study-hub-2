@@ -11,9 +11,9 @@ export default function UpgradeBanner() {
             <Brain className="w-5 h-5 text-white" />
           </div>
           <div>
-            <p className="font-bold text-white">Unlock Claude Sonnet AI</p>
+            <p className="font-bold text-white">Unlock full AI access</p>
             <p className="text-sm text-blue-100 mt-0.5">
-              Upgrade to Pro for our most capable model — deeper reasoning, richer explanations.
+              Plus ($8/mo) for unlimited sessions · Pro ($15/mo) for Claude Sonnet AI.
             </p>
           </div>
         </div>
@@ -22,7 +22,7 @@ export default function UpgradeBanner() {
           className="shrink-0 bg-white text-electric text-sm font-bold px-4 py-2.5 rounded-xl hover:bg-blue-50 transition-colors flex items-center gap-1.5 shadow-sm"
         >
           <Zap className="w-3.5 h-3.5" fill="currentColor" />
-          Upgrade — $15/mo
+          View plans
           <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>

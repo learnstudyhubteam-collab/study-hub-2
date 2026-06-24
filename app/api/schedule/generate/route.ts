@@ -1,8 +1,8 @@
 import { generateText } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
 import { createClient } from '@/lib/supabase/server'
-import { getModelForStatus } from '@/lib/tier'
-import type { SubscriptionStatus } from '@/types'
+import { getModelForPlan, PLAN_LIMITS } from '@/lib/tier'
+import type { SubscriptionPlan } from '@/lib/tier'
 
 export async function POST(req: Request) {
   const { subjects, examDate, hoursPerDay, title, extraContext } = await req.json()
@@ -12,10 +12,17 @@ export async function POST(req: Request) {
   if (!user) return new Response('Unauthorized', { status: 401 })
 
   const { data: profile } = await supabase
-    .from('profiles').select('subscription_status').eq('id', user.id).single()
+    .from('profiles').select('subscription_plan, subscription_status').eq('id', user.id).single()
 
-  const modelId = getModelForStatus((profile?.subscription_status as SubscriptionStatus) ?? 'free')
+  const status = profile?.subscription_status ?? 'free'
+  const plan = (status === 'active' ? (profile?.subscription_plan ?? 'free') : 'free') as SubscriptionPlan
+  const limits = PLAN_LIMITS[plan]
 
+  if (!limits.aiScheduleGen) {
+    return Response.json({ error: 'AI schedule generation requires a Plus or Pro plan.' }, { status: 403 })
+  }
+
+  const modelId = getModelForPlan(plan)
   const subjectsStr = Array.isArray(subjects) ? subjects.join(', ') : subjects
   const daysUntilExam = examDate
     ? Math.ceil((new Date(examDate).getTime() - Date.now()) / 86400000)
