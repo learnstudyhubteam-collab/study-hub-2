@@ -5,8 +5,53 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Button from '@/components/ui/button'
 import Input from '@/components/ui/input'
-import { Layers, Plus, X, Zap, RotateCcw, Check, ChevronLeft, ChevronRight, Sparkles } from 'lucide-react'
+import { Layers, Plus, X, Zap, RotateCcw, Check, ChevronLeft, ChevronRight, Sparkles, RefreshCw } from 'lucide-react'
 import type { FlashcardDeck, FlashcardCard } from '@/types'
+
+function FlipCard({ card }: { card: FlashcardCard }) {
+  const [flipped, setFlipped] = useState(false)
+  return (
+    <div
+      className="perspective-1000 cursor-pointer group"
+      style={{ minHeight: '180px' }}
+      onClick={() => setFlipped((f) => !f)}
+    >
+      <div
+        className={`relative w-full h-full transition-all duration-500 ${flipped ? 'rotate-y-180' : ''}`}
+        style={{ transformStyle: 'preserve-3d', minHeight: '180px' }}
+      >
+        {/* Front */}
+        <div className="absolute inset-0 glass rounded-2xl p-5 flex flex-col justify-between backface-hidden shadow-glass hover:shadow-glass-hover transition-shadow">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-bold text-electric uppercase tracking-widest">Question</span>
+            <RefreshCw className="w-3.5 h-3.5 text-gray-300 group-hover:text-electric transition-colors" />
+          </div>
+          <p className="text-sm font-semibold text-gray-900 leading-relaxed flex-1 flex items-center">
+            {card.front}
+          </p>
+          <p className="text-[10px] text-gray-400 mt-3">Tap to flip</p>
+        </div>
+
+        {/* Back */}
+        <div className="absolute inset-0 glass-blue rounded-2xl p-5 flex flex-col justify-between backface-hidden rotate-y-180 shadow-glass-blue">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[10px] font-bold text-electric uppercase tracking-widest">Answer</span>
+            <RefreshCw className="w-3.5 h-3.5 text-electric/50" />
+          </div>
+          <p className="text-sm font-semibold text-gray-800 leading-relaxed flex-1 flex items-center">
+            {card.back}
+          </p>
+          {card.times_seen > 0 && (
+            <div className="flex items-center gap-1.5 mt-3">
+              <Check className="w-3 h-3 text-electric" />
+              <p className="text-[10px] text-gray-500">{card.times_correct}/{card.times_seen} correct</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 interface PageProps {
   params: Promise<{ deckId: string }>
@@ -271,28 +316,11 @@ export default function DeckPage({ params }: PageProps) {
         </form>
       </div>
 
-      {/* Cards grid */}
+      {/* Cards grid — real flip cards */}
       {cards.length > 0 ? (
-        <div className="grid sm:grid-cols-2 gap-3">
-          {cards.map((card, i) => (
-            <div
-              key={card.id}
-              className="glass rounded-2xl p-5 group hover:border-electric/20 transition-all duration-200 border border-white/85"
-              style={{ animationDelay: `${i * 30}ms` }}
-            >
-              <p className="text-sm font-semibold text-gray-900 mb-2">{card.front}</p>
-              <div className="border-t border-gray-100/80 pt-2">
-                <p className="text-sm text-gray-500">{card.back}</p>
-              </div>
-              {card.times_seen > 0 && (
-                <div className="flex items-center gap-1.5 mt-3">
-                  <Check className="w-3 h-3 text-electric" />
-                  <p className="text-xs text-gray-400">
-                    {card.times_correct}/{card.times_seen} correct
-                  </p>
-                </div>
-              )}
-            </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {cards.map((card) => (
+            <FlipCard key={card.id} card={card} />
           ))}
         </div>
       ) : (

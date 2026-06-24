@@ -6,6 +6,8 @@ import ScrollReveal from '@/components/ui/scroll-reveal'
 import { BookOpen, Layers, Zap, ArrowRight, Clock, ChevronRight } from 'lucide-react'
 import type { StudySession, FlashcardDeck } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 export default async function DashboardPage() {
   const supabase = await createClient()
   const {
