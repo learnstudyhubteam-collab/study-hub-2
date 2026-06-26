@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Keys to merge into the Capacitor-generated ios/App/App/Info.plist
+  After running `npx cap add ios`, open ios/App/App/Info.plist in Xcode
+  and add these entries (or merge with the Xcode plist editor).
+-->
+<plist version="1.0">
+<dict>
+  <!-- App privacy: no camera, microphone, or location used -->
+  <!-- Required only if you add those features later -->
+
+  <!-- ITSAppUsesNonExemptEncryption: set to NO because we use Apple's own HTTPS
+       (no custom encryption) — avoids an annual export compliance question -->
+  <key>ITSAppUsesNonExemptEncryption</key>
+  <false/>
+
+  <!-- Allows HTTP to localhost during development only; remove for prod -->
+  <!-- <key>NSAppTransportSecurity</key>
+  <dict>
+    <key>NSAllowsLocalNetworking</key>
+    <true/>
+  </dict> -->
+
+  <!-- URL scheme for Supabase deep-link auth callbacks -->
+  <key>CFBundleURLTypes</key>
+  <array>
+    <dict>
+      <key>CFBundleURLSchemes</key>
+      <array>
+        <string>com.studyhub.app</string>
+      </array>
+    </dict>
+  </array>
+
+  <!-- Supported interface orientations -->
+  <key>UISupportedInterfaceOrientations</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationPortraitUpsideDown</string>
+  </array>
+  <key>UISupportedInterfaceOrientations~ipad</key>
+  <array>
+    <string>UIInterfaceOrientationPortrait</string>
+    <string>UIInterfaceOrientationPortraitUpsideDown</string>
+    <string>UIInterfaceOrientationLandscapeLeft</string>
+    <string>UIInterfaceOrientationLandscapeRight</string>
+  </array>
+</dict>
+</plist>
