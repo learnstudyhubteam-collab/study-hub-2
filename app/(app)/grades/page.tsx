@@ -59,7 +59,7 @@ export default function GradesPage() {
     e.preventDefault()
     setSaving(true); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setSaving(false); return }
     const { data, error: err } = await supabase.from('grade_entries').insert({
       user_id: user.id, subject, assignment_name: assignmentName,
       score: parseFloat(score), max_score: parseFloat(maxScore),
@@ -72,7 +72,9 @@ export default function GradesPage() {
   }
 
   async function deleteEntry(id: string) {
-    await supabase.from('grade_entries').delete().eq('id', id)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('grade_entries').delete().eq('id', id).eq('user_id', user.id)
     setEntries((p) => p.filter((e) => e.id !== id))
   }
 

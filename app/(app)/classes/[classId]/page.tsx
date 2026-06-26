@@ -64,7 +64,7 @@ export default function ClassDetailPage({ params }: PageProps) {
     e.preventDefault()
     setSaving(true); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setSaving(false); return }
     const { data, error: err } = await supabase.from('assignments').insert({
       user_id: user.id, class_id: classId, title,
       description: description || null, due_date: dueDate || null,
@@ -77,7 +77,9 @@ export default function ClassDetailPage({ params }: PageProps) {
   }
 
   async function updateAssignmentStatus(id: string, status: AssignmentStatus) {
-    await supabase.from('assignments').update({ status }).eq('id', id)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('assignments').update({ status }).eq('id', id).eq('user_id', user.id)
     setAssignments((p) => p.map((a) => a.id === id ? { ...a, status } : a))
   }
 
@@ -155,7 +157,7 @@ export default function ClassDetailPage({ params }: PageProps) {
             <GraduationCap className="w-10 h-10 text-electric mx-auto mb-2" />
             <p className="text-sm text-gray-600">
               {role === 'teacher'
-                ? `Share your invite code <strong>${cls.invite_code}</strong> for students to join.`
+                ? <>Share your invite code <strong className="text-electric">{cls.invite_code}</strong> for students to join.</>
                 : `You're enrolled in ${cls.name}.`}
             </p>
           </div>

@@ -39,7 +39,7 @@ export default function GroupsPage() {
     e.preventDefault()
     setSaving(true); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setSaving(false); return }
     const { data, error: err } = await supabase.from('study_groups').insert({
       name, subject: subject || null, description: description || null, created_by: user.id,
     }).select('*').single()
@@ -54,11 +54,11 @@ export default function GroupsPage() {
     e.preventDefault()
     setSaving(true); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setSaving(false); return }
     const { data: grp } = await supabase.from('study_groups').select('*').eq('invite_code', joinCode.trim().toUpperCase()).single()
     if (!grp) { setError('Group not found. Check the invite code.'); setSaving(false); return }
     const { error: err } = await supabase.from('study_group_members').insert({ group_id: grp.id, user_id: user.id })
-    if (err && !err.message.includes('unique')) { setError(err.message); setSaving(false); return }
+    if (err && (err as any).code !== '23505') { setError(err.message); setSaving(false); return }
     if (!groups.find((g) => g.id === grp.id)) setGroups((p) => [...p, grp as StudyGroup])
     setJoinCode(''); setShowJoin(false); setSaving(false)
   }

@@ -52,7 +52,9 @@ export default function GuidesPage() {
   }
 
   async function deleteGuide(id: string) {
-    await supabase.from('study_guides').delete().eq('id', id)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('study_guides').delete().eq('id', id).eq('user_id', user.id)
     setGuides((p) => p.filter((g) => g.id !== id))
     if (expanded === id) setExpanded(null)
   }

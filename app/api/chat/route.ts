@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .gte('created_at', startOfMonth.toISOString())
-    if ((count ?? 0) > limits.aiSessionsPerMonth) {
+    if ((count ?? 0) >= limits.aiSessionsPerMonth) {
       return Response.json(
         { error: `Free plan allows ${limits.aiSessionsPerMonth} AI sessions per month. Upgrade to continue.` },
         { status: 403 }

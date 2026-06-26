@@ -59,7 +59,9 @@ export default function SchedulePage() {
   }
 
   async function deleteSchedule(id: string) {
-    await supabase.from('study_schedules').delete().eq('id', id)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('study_schedules').delete().eq('id', id).eq('user_id', user.id)
     setSchedules((p) => p.filter((s) => s.id !== id))
     if (expanded === id) setExpanded(null)
   }

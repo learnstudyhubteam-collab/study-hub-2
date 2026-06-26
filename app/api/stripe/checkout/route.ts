@@ -4,9 +4,16 @@ import { stripe } from '@/lib/stripe'
 export async function POST(req: Request) {
   const { plan = 'pro' } = await req.json().catch(() => ({}))
 
-  const priceId = plan === 'plus'
-    ? process.env.STRIPE_PRICE_ID_PLUS!
-    : process.env.STRIPE_PRICE_ID_PRO!
+  if (plan !== 'plus' && plan !== 'pro') {
+    return new Response('Invalid plan', { status: 400 })
+  }
+
+  const plusPriceId = process.env.STRIPE_PRICE_ID_PLUS
+  const proPriceId = process.env.STRIPE_PRICE_ID_PRO
+  if (!plusPriceId || !proPriceId) {
+    return new Response('Stripe price IDs not configured', { status: 500 })
+  }
+  const priceId = plan === 'plus' ? plusPriceId : proPriceId
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

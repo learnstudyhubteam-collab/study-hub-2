@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
-import { getUserSubscriptionStatus, isPro } from '@/lib/tier'
+import { getUserPlan } from '@/lib/tier'
 import UpgradeBanner from '@/components/billing/UpgradeBanner'
 import ScrollReveal from '@/components/ui/scroll-reveal'
 import { BookOpen, Layers, Zap, ArrowRight, Clock, ChevronRight } from 'lucide-react'
@@ -14,8 +14,8 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const status = await getUserSubscriptionStatus()
-  const proUser = isPro(status)
+  const plan = await getUserPlan()
+  const proUser = plan === 'plus' || plan === 'pro'
 
   const [{ data: sessions }, { data: decks }, { data: profile }] = await Promise.all([
     supabase

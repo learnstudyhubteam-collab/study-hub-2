@@ -55,7 +55,7 @@ export default function AssignmentsPage() {
     e.preventDefault()
     setSaving(true); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setSaving(false); return }
     const { data, error: err } = await supabase.from('assignments').insert({
       user_id: user.id, title, subject: subject || null, description: description || null,
       due_date: dueDate || null, priority, status: 'pending',
@@ -67,12 +67,16 @@ export default function AssignmentsPage() {
   }
 
   async function updateStatus(id: string, status: AssignmentStatus) {
-    await supabase.from('assignments').update({ status }).eq('id', id)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('assignments').update({ status }).eq('id', id).eq('user_id', user.id)
     setAssignments((p) => p.map((a) => a.id === id ? { ...a, status } : a))
   }
 
   async function deleteAssignment(id: string) {
-    await supabase.from('assignments').delete().eq('id', id)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('assignments').delete().eq('id', id).eq('user_id', user.id)
     setAssignments((p) => p.filter((a) => a.id !== id))
   }
 

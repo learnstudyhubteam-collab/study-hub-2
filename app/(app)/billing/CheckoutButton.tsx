@@ -14,14 +14,19 @@ export default function CheckoutButton({ plan, label, className = '' }: Props) {
 
   async function handleUpgrade() {
     setLoading(true)
-    const res = await fetch('/api/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan }),
-    })
-    const { url } = await res.json()
-    if (url) window.location.href = url
-    else setLoading(false)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan }),
+      })
+      if (!res.ok) throw new Error(await res.text())
+      const { url } = await res.json()
+      if (url) window.location.href = url
+      else setLoading(false)
+    } catch {
+      setLoading(false)
+    }
   }
 
   return (

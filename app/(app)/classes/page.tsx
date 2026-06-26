@@ -59,7 +59,7 @@ export default function ClassesPage() {
     e.preventDefault()
     setSaving(true); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setSaving(false); return }
     const { data, error: err } = await supabase.from('classes').insert({ teacher_id: user.id, name, subject: subject || null, section: section || null, description: description || null }).select('*').single()
     if (err) { setError(err.message); setSaving(false); return }
     setClasses((p) => [data as ClassRow, ...p])
@@ -70,11 +70,11 @@ export default function ClassesPage() {
     e.preventDefault()
     setSaving(true); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setSaving(false); return }
     const { data: cls } = await supabase.from('classes').select('*').eq('invite_code', joinCode.trim().toUpperCase()).single()
     if (!cls) { setError('Class not found. Check the invite code.'); setSaving(false); return }
     const { error: err } = await supabase.from('class_members').insert({ class_id: cls.id, user_id: user.id })
-    if (err && !err.message.includes('unique')) { setError(err.message); setSaving(false); return }
+    if (err && (err as any).code !== '23505') { setError(err.message); setSaving(false); return }
     setClasses((p) => [...p, cls as ClassRow])
     setJoinCode(''); setShowJoin(false); setSaving(false)
   }

@@ -65,7 +65,7 @@ export default function ExamsPage() {
     e.preventDefault()
     setSaving(true); setError(null)
     const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
+    if (!user) { setSaving(false); return }
     const { data, error: err } = await supabase.from('exams').insert({
       user_id: user.id, title, subject: subject || null, exam_date: examDate, notes: notes || null,
     }).select('*').single()
@@ -76,7 +76,9 @@ export default function ExamsPage() {
   }
 
   async function deleteExam(id: string) {
-    await supabase.from('exams').delete().eq('id', id)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    await supabase.from('exams').delete().eq('id', id).eq('user_id', user.id)
     setExams((p) => p.filter((e) => e.id !== id))
   }
 

@@ -10,7 +10,8 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 
-interface SidebarProps { isPro?: boolean }
+import type { SubscriptionPlan } from '@/lib/tier'
+interface SidebarProps { plan?: SubscriptionPlan }
 
 const navGroups = [
   {
@@ -45,7 +46,8 @@ const navGroups = [
   },
 ]
 
-export default function Sidebar({ isPro = false }: SidebarProps) {
+export default function Sidebar({ plan = 'free' }: SidebarProps) {
+  const isPaid = plan === 'plus' || plan === 'pro'
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -103,14 +105,14 @@ export default function Sidebar({ isPro = false }: SidebarProps) {
 
       {/* Bottom */}
       <div className="px-3 py-4 border-t border-white/40 space-y-1">
-        {isPro ? (
+        {isPaid ? (
           <Link
             href="/billing"
             onClick={() => setMobileOpen(false)}
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-electric bg-electric/8 hover:bg-electric/12 transition-colors"
           >
             <Sparkles className="w-4 h-4" />
-            Pro plan active
+            {plan === 'pro' ? 'Pro plan active' : 'Plus plan active'}
           </Link>
         ) : (
           <Link

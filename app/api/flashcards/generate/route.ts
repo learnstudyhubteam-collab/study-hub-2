@@ -58,7 +58,8 @@ Example format:
     back: c.back,
   }))
 
-  const { data: inserted } = await supabase.from('flashcard_cards').insert(rows).select('*')
+  const { data: inserted, error: insertErr } = await supabase.from('flashcard_cards').insert(rows).select('*')
+  if (insertErr) return Response.json({ error: insertErr.message }, { status: 500 })
 
   return Response.json(inserted ?? [])
 }

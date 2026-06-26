@@ -9,7 +9,9 @@ const PRO_PRICE_ID = process.env.STRIPE_PRICE_ID_PRO
 
 function planFromPriceId(priceId: string | null | undefined): 'plus' | 'pro' {
   if (priceId && PLUS_PRICE_ID && priceId === PLUS_PRICE_ID) return 'plus'
-  return 'pro'
+  if (priceId && PRO_PRICE_ID && priceId === PRO_PRICE_ID) return 'pro'
+  // Unknown price ID — default to plus (least privilege)
+  return 'plus'
 }
 
 export async function POST(req: Request) {
