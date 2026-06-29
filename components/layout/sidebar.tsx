@@ -7,7 +7,7 @@ import {
   Zap, LayoutDashboard, BookOpen, Layers, CreditCard, LogOut,
   GraduationCap, ClipboardList, Calculator, Clock, CalendarClock,
   Users, FileText, Menu, X, Sparkles, Settings, Command, Link2, Sigma,
-  Shield, Monitor, Megaphone, BarChart3,
+  Shield, Monitor, Megaphone, BarChart3, AlertTriangle,
 } from 'lucide-react'
 import { useState } from 'react'
 import PomodoroTimer from '@/components/layout/PomodoroTimer'
@@ -67,6 +67,7 @@ const teacherNavGroups = [
     items: [
       { href: '/teacher', label: 'Teacher Dashboard', icon: GraduationCap },
       { href: '/monitor', label: 'Screen Monitor', icon: Monitor },
+      { href: '/overdue', label: 'Overdue Items', icon: AlertTriangle },
     ],
   },
   {
@@ -103,6 +104,7 @@ const adminNavGroups = [
       { href: '/admin', label: 'Admin Dashboard', icon: Shield },
       { href: '/admin/users', label: 'User Management', icon: Users },
       { href: '/monitor', label: 'Screen Monitor', icon: Monitor },
+      { href: '/overdue', label: 'Overdue Items', icon: AlertTriangle },
     ],
   },
   {

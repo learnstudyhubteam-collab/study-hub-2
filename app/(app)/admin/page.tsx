@@ -57,12 +57,18 @@ export default async function AdminDashboardPage() {
       .eq('activity_date', todayStr),
   ])
 
+  const { count: overdueCount } = await supabase
+    .from('assignments')
+    .select('*', { count: 'exact', head: true })
+    .eq('status', 'overdue')
+
   const stats = [
-    { label: 'Total Users', value: totalUsers ?? 0, icon: Users, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: 'Teachers', value: totalTeachers ?? 0, icon: GraduationCap, color: 'text-violet-500', bg: 'bg-violet-50' },
-    { label: 'Students', value: totalStudents ?? 0, icon: BookOpen, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-    { label: 'Active Classes', value: totalClasses ?? 0, icon: School, color: 'text-orange-500', bg: 'bg-orange-50' },
-    { label: 'Active Today', value: activeToday?.length ?? 0, icon: TrendingUp, color: 'text-cyan-500', bg: 'bg-cyan-50' },
+    { label: 'Total Users', value: totalUsers ?? 0, icon: Users, color: 'text-blue-500', bg: 'bg-blue-50', href: '/admin/users' },
+    { label: 'Teachers', value: totalTeachers ?? 0, icon: GraduationCap, color: 'text-violet-500', bg: 'bg-violet-50', href: '/admin/users' },
+    { label: 'Students', value: totalStudents ?? 0, icon: BookOpen, color: 'text-emerald-500', bg: 'bg-emerald-50', href: '/admin/users' },
+    { label: 'Active Classes', value: totalClasses ?? 0, icon: School, color: 'text-orange-500', bg: 'bg-orange-50', href: '/classes' },
+    { label: 'Active Today', value: activeToday?.length ?? 0, icon: TrendingUp, color: 'text-cyan-500', bg: 'bg-cyan-50', href: '/monitor' },
+    { label: 'Overdue Items', value: overdueCount ?? 0, icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50', href: '/overdue' },
   ]
 
   const roleColors: Record<string, string> = {
@@ -109,17 +115,20 @@ export default async function AdminDashboardPage() {
 
       {/* Stats grid */}
       <ScrollReveal delay={0.05}>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {stats.map((s) => {
             const Icon = s.icon
+            const isOverdue = s.label === 'Overdue Items'
             return (
-              <div key={s.label} className="glass rounded-2xl p-4 space-y-2">
+              <Link key={s.label} href={s.href} className={`glass rounded-2xl p-4 space-y-2 transition-all hover:shadow-md hover:-translate-y-0.5 ${isOverdue && (overdueCount ?? 0) > 0 ? 'border border-red-200 bg-red-50/30' : ''}`}>
                 <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center`}>
                   <Icon className={`w-4.5 h-4.5 ${s.color}`} />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{s.value.toLocaleString()}</p>
+                <p className={`text-2xl font-bold ${isOverdue && (overdueCount ?? 0) > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                  {s.value.toLocaleString()}
+                </p>
                 <p className="text-xs text-gray-500 font-medium">{s.label}</p>
-              </div>
+              </Link>
             )
           })}
         </div>
@@ -222,8 +231,8 @@ export default async function AdminDashboardPage() {
             {[
               { label: 'User Management', desc: 'View, edit, or remove users', icon: Users, href: '/admin/users', color: 'text-blue-500 bg-blue-50' },
               { label: 'Screen Monitor', desc: 'Watch student activity live', icon: Monitor, href: '/monitor', color: 'text-violet-500 bg-violet-50' },
+              { label: 'Overdue Items', desc: `${overdueCount ?? 0} overdue platform-wide`, icon: AlertTriangle, href: '/overdue', color: 'text-red-500 bg-red-50' },
               { label: 'Announcements', desc: 'Broadcast to all users', icon: Megaphone, href: '/admin/announcements/new', color: 'text-orange-500 bg-orange-50' },
-              { label: 'School Settings', desc: 'Configure school info', icon: Settings, href: '/settings', color: 'text-emerald-500 bg-emerald-50' },
             ].map((action) => {
               const Icon = action.icon
               const [iconColor, iconBg] = action.color.split(' ')

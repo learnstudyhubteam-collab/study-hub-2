@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import {
   GraduationCap, Users, ClipboardList, BarChart3, Monitor,
-  Plus, ChevronRight, BookOpen, Clock, CheckCircle, AlertTriangle, TrendingUp,
+  Plus, ChevronRight, BookOpen, Clock, CheckCircle, AlertTriangle, TrendingUp, ExternalLink,
 } from 'lucide-react'
 import ScrollReveal from '@/components/ui/scroll-reveal'
 
@@ -124,21 +124,24 @@ export default async function TeacherDashboardPage() {
       <ScrollReveal delay={0.05}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { label: 'My Classes', value: myClasses?.length ?? 0, icon: GraduationCap, color: 'text-violet-500 bg-violet-50' },
-            { label: 'Total Students', value: uniqueStudents, icon: Users, color: 'text-blue-500 bg-blue-50' },
-            { label: 'Active Today', value: recentActivity?.length ?? 0, icon: TrendingUp, color: 'text-emerald-500 bg-emerald-50' },
-            { label: 'Overdue Items', value: overdueCount, icon: AlertTriangle, color: 'text-red-500 bg-red-50' },
+            { label: 'My Classes', value: myClasses?.length ?? 0, icon: GraduationCap, color: 'text-violet-500 bg-violet-50', href: '/classes' },
+            { label: 'Total Students', value: uniqueStudents, icon: Users, color: 'text-blue-500 bg-blue-50', href: '/classes' },
+            { label: 'Active Today', value: recentActivity?.length ?? 0, icon: TrendingUp, color: 'text-emerald-500 bg-emerald-50', href: '/monitor' },
+            { label: 'Overdue Items', value: overdueCount, icon: AlertTriangle, color: 'text-red-500 bg-red-50', href: '/overdue' },
           ].map((s) => {
             const [iconColor, iconBg] = s.color.split(' ')
             const Icon = s.icon
+            const isOverdue = s.label === 'Overdue Items'
             return (
-              <div key={s.label} className="glass rounded-2xl p-4 space-y-2">
+              <Link key={s.label} href={s.href} className={`glass rounded-2xl p-4 space-y-2 block transition-all hover:shadow-md hover:-translate-y-0.5 ${isOverdue && overdueCount > 0 ? 'border border-red-200 bg-red-50/30' : ''}`}>
                 <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center`}>
                   <Icon className={`w-4.5 h-4.5 ${iconColor}`} />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">{s.value}</p>
+                <p className={`text-2xl font-bold ${isOverdue && overdueCount > 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                  {s.value}
+                </p>
                 <p className="text-xs text-gray-500 font-medium">{s.label}</p>
-              </div>
+              </Link>
             )
           })}
         </div>
@@ -243,8 +246,8 @@ export default async function TeacherDashboardPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
               { label: 'Screen Monitor', desc: 'Watch student activity', icon: Monitor, href: '/monitor', color: 'text-violet-500 bg-violet-50' },
+              { label: 'Overdue Items', desc: `${overdueCount} item${overdueCount !== 1 ? 's' : ''} need attention`, icon: AlertTriangle, href: '/overdue', color: 'text-red-500 bg-red-50' },
               { label: 'My Classes', desc: 'Manage class rosters', icon: GraduationCap, href: '/classes', color: 'text-blue-500 bg-blue-50' },
-              { label: 'Assignments', desc: 'Post & track work', icon: ClipboardList, href: '/assignments', color: 'text-emerald-500 bg-emerald-50' },
               { label: 'Grades', desc: 'View grade entries', icon: BarChart3, href: '/grades', color: 'text-orange-500 bg-orange-50' },
             ].map((action) => {
               const Icon = action.icon
