@@ -7,6 +7,7 @@ import Button from '@/components/ui/button'
 import Input from '@/components/ui/input'
 import { Layers, Plus, X, Calendar } from 'lucide-react'
 import type { FlashcardDeck } from '@/types'
+import { toast } from '@/lib/toast'
 
 export default function FlashcardsPage() {
   const [decks, setDecks] = useState<FlashcardDeck[]>([])
@@ -55,6 +56,7 @@ export default function FlashcardsPage() {
       setTitle('')
       setSubject('')
       setShowForm(false)
+      toast('Deck created!', 'success')
     }
     setCreating(false)
   }

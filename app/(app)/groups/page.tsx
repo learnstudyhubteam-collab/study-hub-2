@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Users, Plus, LogIn, X, Copy, Check, MessageSquare, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import type { StudyGroup } from '@/types'
+import { toast } from '@/lib/toast'
 
 export default function GroupsPage() {
   const [groups, setGroups] = useState<StudyGroup[]>([])
@@ -49,6 +50,7 @@ export default function GroupsPage() {
     setGroups((p) => [data as StudyGroup, ...p])
     setName(''); setSubject(''); setDescription('')
     setShowCreate(false); setSaving(false)
+    toast('Study group created!', 'success')
   }
 
   async function joinGroup(e: React.FormEvent) {
@@ -62,11 +64,13 @@ export default function GroupsPage() {
     if (err && (err as any).code !== '23505') { setError(err.message); setSaving(false); return }
     if (!groups.find((g) => g.id === grp.id)) setGroups((p) => [...p, grp as StudyGroup])
     setJoinCode(''); setShowJoin(false); setSaving(false)
+    toast('Joined group successfully!', 'success')
   }
 
   function copyCode(code: string, id: string) {
     navigator.clipboard.writeText(code)
     setCopiedId(id)
+    toast('Invite code copied!', 'info')
     setTimeout(() => setCopiedId(null), 2000)
   }
 

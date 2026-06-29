@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Users, Send, Copy, Check, MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import type { StudyGroup, GroupMessage } from '@/types'
+import { toast } from '@/lib/toast'
 
 interface PageProps { params: Promise<{ groupId: string }> }
 
@@ -28,57 +29,57 @@ export default function GroupChatPage({ params }: PageProps) {
   const router = useRouter()
   const supabase = createClient()
 
-  useEffect(() => { load() }, [groupId])
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null
+
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      setCurrentUserId(user.id)
+
+      const { data: membership } = await supabase
+        .from('study_group_members')
+        .select('group_id')
+        .eq('group_id', groupId)
+        .eq('user_id', user.id)
+        .single()
+      if (!membership) { router.push('/groups'); return }
+
+      const [{ data: groupData }, { data: msgs }, { data: membersData }] = await Promise.all([
+        supabase.from('study_groups').select('*').eq('id', groupId).single(),
+        supabase.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true }).limit(100),
+        supabase.from('study_group_members').select('user_id, profiles(full_name, email)').eq('group_id', groupId),
+      ])
+
+      if (!groupData) { router.push('/groups'); return }
+      setGroup(groupData as StudyGroup)
+      setMessages((msgs ?? []) as GroupMessage[])
+      setMembers((membersData ?? []) as unknown as Member[])
+      setLoading(false)
+
+      channel = supabase
+        .channel(`group-${groupId}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${groupId}` },
+          (payload) => {
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === (payload.new as GroupMessage).id)) return prev
+              return [...prev, payload.new as GroupMessage]
+            })
+          }
+        )
+        .subscribe()
+    }
+
+    load()
+    return () => { if (channel) supabase.removeChannel(channel) }
+  }, [groupId])
 
   // Scroll to bottom when messages change
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
-
-  async function load() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    setCurrentUserId(user.id)
-
-    // Check membership
-    const { data: membership } = await supabase
-      .from('study_group_members')
-      .select('group_id')
-      .eq('group_id', groupId)
-      .eq('user_id', user.id)
-      .single()
-    if (!membership) { router.push('/groups'); return }
-
-    const [{ data: groupData }, { data: msgs }, { data: membersData }] = await Promise.all([
-      supabase.from('study_groups').select('*').eq('id', groupId).single(),
-      supabase.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true }).limit(100),
-      supabase.from('study_group_members').select('user_id, profiles(full_name, email)').eq('group_id', groupId),
-    ])
-
-    if (!groupData) { router.push('/groups'); return }
-    setGroup(groupData as StudyGroup)
-    setMessages((msgs ?? []) as GroupMessage[])
-    setMembers((membersData ?? []) as unknown as Member[])
-    setLoading(false)
-
-    // Subscribe to new messages
-    const channel = supabase
-      .channel(`group-${groupId}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${groupId}` },
-        (payload) => {
-          setMessages((prev) => {
-            // Avoid duplicates (optimistic update already added it)
-            if (prev.some((m) => m.id === (payload.new as GroupMessage).id)) return prev
-            return [...prev, payload.new as GroupMessage]
-          })
-        }
-      )
-      .subscribe()
-
-    return () => { supabase.removeChannel(channel) }
-  }
 
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault()
@@ -109,6 +110,7 @@ export default function GroupChatPage({ params }: PageProps) {
     if (!group) return
     navigator.clipboard.writeText(group.invite_code)
     setCopied(true)
+    toast('Invite code copied!', 'success')
     setTimeout(() => setCopied(false), 2000)
   }
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Calculator, Plus, X, TrendingUp } from 'lucide-react'
 import type { GradeEntry } from '@/types'
+import { toast } from '@/lib/toast'
 
 function getLetterGrade(pct: number) {
   if (pct >= 90) return { letter: 'A', color: 'text-emerald-600' }
@@ -69,6 +70,7 @@ export default function GradesPage() {
     setEntries((p) => [data as GradeEntry, ...p])
     setAssignmentName(''); setScore(''); setMaxScore('100'); setWeight('1'); setCategory('')
     setShowCreate(false); setSaving(false)
+    toast('Grade entry added!', 'success')
   }
 
   async function deleteEntry(id: string) {
@@ -76,6 +78,7 @@ export default function GradesPage() {
     if (!user) return
     await supabase.from('grade_entries').delete().eq('id', id).eq('user_id', user.id)
     setEntries((p) => p.filter((e) => e.id !== id))
+    toast('Entry removed', 'info')
   }
 
   const subjects = [...new Set(entries.map((e) => e.subject))]

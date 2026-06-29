@@ -5,7 +5,7 @@ import { logActivity, getStreakData } from '@/lib/activity'
 import UpgradeBanner from '@/components/billing/UpgradeBanner'
 import StreakWidget from '@/components/dashboard/StreakWidget'
 import ScrollReveal from '@/components/ui/scroll-reveal'
-import { BookOpen, Layers, Zap, ArrowRight, Clock, ChevronRight } from 'lucide-react'
+import { BookOpen, Layers, Zap, ArrowRight, Clock, ChevronRight, AlertTriangle, CalendarClock } from 'lucide-react'
 import type { StudySession, FlashcardDeck } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -22,7 +22,14 @@ export default async function DashboardPage() {
   // Log today's activity (upsert — safe to call on every load)
   await logActivity(supabase, user!.id)
 
-  const [{ data: sessions }, { data: decks }, { data: profile }, streakData] = await Promise.all([
+  const now = new Date()
+  const todayEnd = new Date(now)
+  todayEnd.setHours(23, 59, 59, 999)
+  const tomorrowEnd = new Date(now)
+  tomorrowEnd.setDate(tomorrowEnd.getDate() + 1)
+  tomorrowEnd.setHours(23, 59, 59, 999)
+
+  const [{ data: sessions }, { data: decks }, { data: profile }, streakData, { data: urgentAssignments }, { data: urgentExams }] = await Promise.all([
     supabase
       .from('study_sessions')
       .select('*')
@@ -37,6 +44,22 @@ export default async function DashboardPage() {
       .limit(4),
     supabase.from('profiles').select('full_name').eq('id', user!.id).single(),
     getStreakData(supabase, user!.id),
+    supabase
+      .from('assignments')
+      .select('id, title, subject, due_date, priority')
+      .eq('user_id', user!.id)
+      .neq('status', 'completed')
+      .lte('due_date', tomorrowEnd.toISOString())
+      .order('due_date', { ascending: true })
+      .limit(5),
+    supabase
+      .from('exams')
+      .select('id, title, subject, exam_date')
+      .eq('user_id', user!.id)
+      .gte('exam_date', now.toISOString())
+      .lte('exam_date', tomorrowEnd.toISOString())
+      .order('exam_date', { ascending: true })
+      .limit(3),
   ])
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'there'
@@ -130,6 +153,64 @@ export default async function DashboardPage() {
       <ScrollReveal direction="up" delay={120}>
         <StreakWidget streak={streakData.streak} totalDays={streakData.totalDays} last7={streakData.last7} />
       </ScrollReveal>
+
+      {/* Today's Deadlines */}
+      {((urgentAssignments && urgentAssignments.length > 0) || (urgentExams && urgentExams.length > 0)) && (
+        <ScrollReveal direction="up" delay={140}>
+          <div className="glass rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                Due today &amp; tomorrow
+              </h2>
+              <Link href="/assignments" className="text-xs text-electric font-semibold hover:text-electric-dark transition-colors flex items-center gap-0.5">
+                View all <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+            <ul className="space-y-2">
+              {(urgentExams ?? []).map((exam) => {
+                const isToday = new Date(exam.exam_date) <= todayEnd
+                return (
+                  <li key={exam.id}>
+                    <Link href="/exams" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-red-500/5 transition-colors group">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isToday ? 'bg-red-500/15' : 'bg-amber-500/10'}`}>
+                        <CalendarClock className={`w-4 h-4 ${isToday ? 'text-red-500' : 'text-amber-500'}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{exam.title}</p>
+                        {exam.subject && <p className="text-xs text-gray-400">{exam.subject}</p>}
+                      </div>
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${isToday ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'}`}>
+                        {isToday ? 'Today' : 'Tomorrow'}
+                      </span>
+                    </Link>
+                  </li>
+                )
+              })}
+              {(urgentAssignments ?? []).map((assignment) => {
+                const isOverdue = new Date(assignment.due_date) < now
+                const isToday = !isOverdue && new Date(assignment.due_date) <= todayEnd
+                return (
+                  <li key={assignment.id}>
+                    <Link href="/assignments" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-amber-500/5 transition-colors group">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${isOverdue ? 'bg-red-500/15' : isToday ? 'bg-amber-500/10' : 'bg-blue-500/10'}`}>
+                        <Clock className={`w-4 h-4 ${isOverdue ? 'text-red-500' : isToday ? 'text-amber-500' : 'text-blue-500'}`} />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{assignment.title}</p>
+                        {assignment.subject && <p className="text-xs text-gray-400">{assignment.subject}</p>}
+                      </div>
+                      <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full shrink-0 ${isOverdue ? 'bg-red-100 text-red-600' : isToday ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'}`}>
+                        {isOverdue ? 'Overdue' : isToday ? 'Today' : 'Tomorrow'}
+                      </span>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        </ScrollReveal>
+      )}
 
       <div className="grid lg:grid-cols-2 gap-5">
         {/* Recent sessions */}

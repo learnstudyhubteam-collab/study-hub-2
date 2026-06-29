@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Clock, Plus, X, AlertTriangle, CalendarCheck } from 'lucide-react'
 import type { Exam } from '@/types'
+import { toast } from '@/lib/toast'
 
 function Countdown({ examDate }: { examDate: string }) {
   const [now, setNow] = useState(Date.now())
@@ -73,6 +74,7 @@ export default function ExamsPage() {
     setExams((p) => [...p, data as Exam].sort((a, b) => new Date(a.exam_date).getTime() - new Date(b.exam_date).getTime()))
     setTitle(''); setSubject(''); setExamDate(''); setNotes('')
     setShowCreate(false); setSaving(false)
+    toast('Exam added to countdown!', 'success')
   }
 
   async function deleteExam(id: string) {
@@ -80,6 +82,7 @@ export default function ExamsPage() {
     if (!user) return
     await supabase.from('exams').delete().eq('id', id).eq('user_id', user.id)
     setExams((p) => p.filter((e) => e.id !== id))
+    toast('Exam removed', 'info')
   }
 
   const upcoming = exams.filter((e) => new Date(e.exam_date) >= new Date())

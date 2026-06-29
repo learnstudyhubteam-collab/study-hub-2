@@ -6,9 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import {
   Zap, LayoutDashboard, BookOpen, Layers, CreditCard, LogOut,
   GraduationCap, ClipboardList, Calculator, Clock, CalendarClock,
-  Users, FileText, Menu, X, Sparkles, Settings,
+  Users, FileText, Menu, X, Sparkles, Settings, Command,
 } from 'lucide-react'
 import { useState } from 'react'
+import PomodoroTimer from '@/components/layout/PomodoroTimer'
 
 import type { SubscriptionPlan } from '@/lib/tier'
 interface SidebarProps { plan?: SubscriptionPlan }
@@ -46,6 +47,18 @@ const navGroups = [
   },
 ]
 
+const mobileBottomTabs = [
+  { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
+  { href: '/study', label: 'AI Chat', icon: BookOpen },
+  { href: '/flashcards', label: 'Cards', icon: Layers },
+  { href: '/assignments', label: 'Tasks', icon: ClipboardList },
+  { href: '/settings', label: 'More', icon: Menu },
+]
+
+function openCommandPalette() {
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))
+}
+
 export default function Sidebar({ plan = 'free' }: SidebarProps) {
   const isPaid = plan === 'plus' || plan === 'pro'
   const pathname = usePathname()
@@ -69,6 +82,18 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
           </div>
           <span className="text-base font-bold text-gradient">Study Hub</span>
         </Link>
+      </div>
+
+      {/* Cmd+K trigger */}
+      <div className="px-3 pt-3">
+        <button
+          onClick={openCommandPalette}
+          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-black/5 hover:bg-black/8 border border-white/30 text-sm text-gray-400 transition-colors"
+        >
+          <Command className="w-3.5 h-3.5" />
+          <span className="flex-1 text-left text-xs">Quick navigate...</span>
+          <kbd className="text-[10px] bg-white/50 border border-white/40 rounded px-1 py-0.5 text-gray-400">⌘K</kbd>
+        </button>
       </div>
 
       {/* Nav groups */}
@@ -102,6 +127,9 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
           </div>
         ))}
       </nav>
+
+      {/* Pomodoro Timer */}
+      <PomodoroTimer />
 
       {/* Bottom */}
       <div className="px-3 py-4 border-t border-white/40 space-y-1">
@@ -166,12 +194,21 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
           </div>
           <span className="text-sm font-bold text-gradient">Study Hub</span>
         </Link>
-        <button
-          onClick={() => setMobileOpen((o) => !o)}
-          className="p-2 rounded-xl text-gray-500 hover:bg-black/5 transition-colors"
-        >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={openCommandPalette}
+            className="p-2 rounded-xl text-gray-500 hover:bg-black/5 transition-colors"
+            aria-label="Command palette"
+          >
+            <Command className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setMobileOpen((o) => !o)}
+            className="p-2 rounded-xl text-gray-500 hover:bg-black/5 transition-colors"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile drawer */}
@@ -183,6 +220,28 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
           <div className="flex-1 bg-black/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
         </div>
       )}
+
+      {/* Mobile bottom tab bar */}
+      <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 glass-strong border-t border-white/60 flex items-stretch h-16 safe-area-pb">
+        {mobileBottomTabs.map((tab) => {
+          const active = tab.href === '/settings'
+            ? pathname === tab.href
+            : pathname === tab.href || pathname.startsWith(tab.href + '/')
+          const Icon = tab.icon
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
+                active ? 'text-electric' : 'text-gray-400'
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-[10px] font-medium">{tab.label}</span>
+            </Link>
+          )
+        })}
+      </nav>
     </>
   )
 }

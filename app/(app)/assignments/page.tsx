@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { ClipboardList, Plus, X, Check, Clock, AlertCircle, ChevronDown } from 'lucide-react'
 import type { Assignment, AssignmentStatus, AssignmentPriority } from '@/types'
+import { toast } from '@/lib/toast'
 
 const statusColors: Record<AssignmentStatus, string> = {
   pending: 'bg-amber-500/10 text-amber-600',
@@ -64,6 +65,7 @@ export default function AssignmentsPage() {
     setAssignments((p) => [...p, data as Assignment])
     setTitle(''); setSubject(''); setDescription(''); setDueDate(''); setPriority('medium')
     setShowCreate(false); setSaving(false)
+    toast('Assignment added!', 'success')
   }
 
   async function updateStatus(id: string, status: AssignmentStatus) {
@@ -71,6 +73,7 @@ export default function AssignmentsPage() {
     if (!user) return
     await supabase.from('assignments').update({ status }).eq('id', id).eq('user_id', user.id)
     setAssignments((p) => p.map((a) => a.id === id ? { ...a, status } : a))
+    if (status === 'completed') toast('Assignment completed! 🎉', 'success')
   }
 
   async function deleteAssignment(id: string) {
@@ -78,6 +81,7 @@ export default function AssignmentsPage() {
     if (!user) return
     await supabase.from('assignments').delete().eq('id', id).eq('user_id', user.id)
     setAssignments((p) => p.filter((a) => a.id !== id))
+    toast('Assignment removed', 'info')
   }
 
   const filtered = filter === 'all' ? assignments : assignments.filter((a) => a.status === filter)
