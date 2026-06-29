@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
   Zap, LayoutDashboard, BookOpen, Layers, CreditCard, LogOut,
   GraduationCap, ClipboardList, Calculator, Clock, CalendarClock,
-  Users, FileText, Menu, X, Sparkles, Settings, Command, Link2,
+  Users, FileText, Menu, X, Sparkles, Settings, Command, Link2, Sigma,
 } from 'lucide-react'
 import { useState } from 'react'
 import PomodoroTimer from '@/components/layout/PomodoroTimer'
@@ -48,6 +48,13 @@ const navGroups = [
     items: [
       { href: '/groups', label: 'Study Groups', icon: Users },
       { href: '/flashcards', label: 'Flashcards', icon: Layers },
+    ],
+  },
+  {
+    label: 'Tools',
+    color: 'text-orange-500',
+    items: [
+      { href: '/calculator', label: 'Calculator', icon: Sigma },
     ],
   },
 ]

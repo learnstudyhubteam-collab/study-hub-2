@@ -32,8 +32,8 @@
     inset: 0;
     z-index: -1;
     pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44'%3E%3Cline x1='22' y1='14' x2='22' y2='30' stroke='%236366F1' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='14' y1='22' x2='30' y2='22' stroke='%236366F1' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-    opacity: 0.09;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Cline x1='35' y1='31' x2='35' y2='39' stroke='%233B82F6' stroke-width='1.5' stroke-linecap='round'/%3E%3Cline x1='31' y1='35' x2='39' y2='35' stroke='%233B82F6' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    opacity: 0.08;
   }
 
   ::selection {
@@ -127,6 +127,16 @@
       inset 0 1px 0 rgba(255, 255, 255, 1),
       inset 0 0 0 1px rgba(0, 102, 255, 0.06);
     transform: translateY(-5px) scale(1.01);
+  }
+
+  /* ─── New-card glow ──────────────────────────────────── */
+  .card-new-glow {
+    box-shadow:
+      0 0 0 2px rgba(99, 102, 241, 0.18),
+      0 8px 32px rgba(0, 102, 255, 0.06),
+      0 2px 8px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    animation: new-card-pulse 3s ease-in-out infinite;
   }
 
   /* ─── Electric Button ─────────────────────────────────── */
@@ -495,6 +505,11 @@
 @keyframes gradientShift {
   0%, 100% { background-position: 0% 50%; }
   50%       { background-position: 100% 50%; }
+}
+
+@keyframes new-card-pulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(99,102,241,0.18), 0 8px 32px rgba(0,102,255,0.06), 0 2px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.95); }
+  50%       { box-shadow: 0 0 0 3px rgba(99,102,241,0.32), 0 12px 40px rgba(99,102,241,0.14), 0 2px 8px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.98); }
 }
 
 /* ─── Flip Card ─────────────────────────────────────────── */

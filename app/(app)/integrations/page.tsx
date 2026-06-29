@@ -1,14 +1,15 @@
 'use client'
 
 import { useState } from 'react'
+import React from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/lib/toast'
 import {
   Link2, X, Upload, Check, ChevronRight, RefreshCw,
-  Sparkles, Info, GraduationCap, BarChart2, Zap,
+  Sparkles, Info, GraduationCap, BarChart2, Zap, BookOpen, School, Globe2,
 } from 'lucide-react'
 
-type ConnectorId = 'synergy' | 'ixl' | 'performance_matters'
+type ConnectorId = 'synergy' | 'ixl' | 'performance_matters' | 'canvas' | 'powerschool' | 'google_classroom'
 type ModalStep = 'instructions' | 'paste' | 'preview'
 
 interface ParsedEntry {
@@ -19,7 +20,25 @@ interface ParsedEntry {
   category?: string
 }
 
-const CONNECTORS = [
+interface Connector {
+  id: ConnectorId
+  name: string
+  shortName: string
+  description: string
+  gradient: string
+  glow: string
+  chipBg: string
+  chipText: string
+  chipBorder: string
+  category: string
+  Icon: React.ComponentType<{ className?: string }>
+  subjectNeeded: boolean
+  isNew?: boolean
+  csvTemplate: string
+  instructions: string[]
+}
+
+const CONNECTORS: Connector[] = [
   {
     id: 'synergy' as ConnectorId,
     name: 'Synergy StudentVue',
@@ -94,6 +113,84 @@ Science Quiz 2,Science,28,35`,
       'Paste in CSV format on the next step (Test Name, Subject, Score, Possible Score).',
     ],
   },
+  {
+    id: 'canvas' as ConnectorId,
+    name: 'Canvas LMS',
+    shortName: 'Canvas',
+    description: 'Import grades and assignments from your school\'s Canvas learning management system.',
+    gradient: 'from-rose-500 to-pink-500',
+    glow: 'shadow-rose-200',
+    chipBg: 'bg-rose-50',
+    chipText: 'text-rose-700',
+    chipBorder: 'border-rose-200',
+    category: 'Grades + Assignments',
+    Icon: BookOpen,
+    subjectNeeded: false,
+    isNew: true,
+    csvTemplate: `Course,Assignment,Score,Points Possible
+AP Biology,Cell Division Quiz,47,50
+AP Biology,Lab Report 1,92,100
+Algebra II,Homework 3,18,20`,
+    instructions: [
+      'Log into Canvas at your school\'s URL.',
+      'Click on the course you want to import.',
+      'Go to Grades and click the "Export" button (CSV).',
+      'Open the CSV, keep the Course, Assignment, Score, and Points Possible columns.',
+      'Paste the cleaned CSV on the next step.',
+    ],
+  },
+  {
+    id: 'powerschool' as ConnectorId,
+    name: 'PowerSchool',
+    shortName: 'PowerSchool',
+    description: 'Pull in your assignments and scores from PowerSchool\'s student portal.',
+    gradient: 'from-orange-500 to-amber-500',
+    glow: 'shadow-orange-200',
+    chipBg: 'bg-orange-50',
+    chipText: 'text-orange-700',
+    chipBorder: 'border-orange-200',
+    category: 'Grades + Assignments',
+    Icon: School,
+    subjectNeeded: false,
+    isNew: true,
+    csvTemplate: `Class,Assignment,Score,Total Points
+English 10,Essay Draft 1,87,100
+English 10,Vocab Quiz,19,20
+Pre-Calc,Chapter 5 Test,76,100`,
+    instructions: [
+      'Log into your PowerSchool Student portal.',
+      'Navigate to Grades & Attendance.',
+      'Click on a class to see assignments.',
+      'Copy assignment rows to a spreadsheet: Class, Assignment, Score, Total Points.',
+      'Paste the CSV on the next step.',
+    ],
+  },
+  {
+    id: 'google_classroom' as ConnectorId,
+    name: 'Google Classroom',
+    shortName: 'Classroom',
+    description: 'Import your returned assignments and scores from Google Classroom.',
+    gradient: 'from-green-500 to-emerald-500',
+    glow: 'shadow-green-200',
+    chipBg: 'bg-green-50',
+    chipText: 'text-green-700',
+    chipBorder: 'border-green-200',
+    category: 'Grades + Assignments',
+    Icon: Globe2,
+    subjectNeeded: false,
+    isNew: true,
+    csvTemplate: `Assignment,Class,Points Earned,Points Possible
+Newton's Laws Quiz,Physics,48,50
+Photosynthesis Essay,Biology,90,100
+Quadratics HW,Algebra II,20,20`,
+    instructions: [
+      'Open Google Classroom and navigate to your class.',
+      'Click Classwork, then "View your work".',
+      'Note each returned assignment: name, class, points earned, points possible.',
+      'Create a CSV with those four columns.',
+      'Paste it on the next step.',
+    ],
+  },
 ]
 
 function parseSynergy(text: string, subject: string): ParsedEntry[] {
@@ -143,6 +240,54 @@ function parsePM(text: string): ParsedEntry[] {
   return results
 }
 
+function parseCanvas(text: string): ParsedEntry[] {
+  const lines = text.trim().split('\n').filter((l) => l.trim())
+  const startIdx = lines[0]?.toLowerCase().includes('course') ? 1 : 0
+  const results: ParsedEntry[] = []
+  for (let i = startIdx; i < lines.length; i++) {
+    const cols = lines[i].split(',').map((s) => s.trim().replace(/^"|"$/g, ''))
+    if (cols.length < 4) continue
+    const [course, name, scoreStr, possibleStr] = cols
+    const score = parseFloat(scoreStr)
+    const max = parseFloat(possibleStr)
+    if (!name || isNaN(score) || isNaN(max) || max === 0) continue
+    results.push({ assignment_name: name, subject: course || 'Canvas', score, max_score: max })
+  }
+  return results
+}
+
+function parsePowerSchool(text: string): ParsedEntry[] {
+  const lines = text.trim().split('\n').filter((l) => l.trim())
+  const startIdx = lines[0]?.toLowerCase().includes('class') ? 1 : 0
+  const results: ParsedEntry[] = []
+  for (let i = startIdx; i < lines.length; i++) {
+    const cols = lines[i].split(',').map((s) => s.trim().replace(/^"|"$/g, ''))
+    if (cols.length < 4) continue
+    const [cls, name, scoreStr, totalStr] = cols
+    const score = parseFloat(scoreStr)
+    const max = parseFloat(totalStr)
+    if (!name || isNaN(score) || isNaN(max) || max === 0) continue
+    results.push({ assignment_name: name, subject: cls || 'PowerSchool', score, max_score: max })
+  }
+  return results
+}
+
+function parseGoogleClassroom(text: string): ParsedEntry[] {
+  const lines = text.trim().split('\n').filter((l) => l.trim())
+  const startIdx = lines[0]?.toLowerCase().includes('assignment') ? 1 : 0
+  const results: ParsedEntry[] = []
+  for (let i = startIdx; i < lines.length; i++) {
+    const cols = lines[i].split(',').map((s) => s.trim().replace(/^"|"$/g, ''))
+    if (cols.length < 4) continue
+    const [name, cls, scoreStr, possibleStr] = cols
+    const score = parseFloat(scoreStr)
+    const max = parseFloat(possibleStr)
+    if (!name || isNaN(score) || isNaN(max) || max === 0) continue
+    results.push({ assignment_name: name, subject: cls || 'Google Classroom', score, max_score: max })
+  }
+  return results
+}
+
 function letterFor(pct: number) {
   if (pct >= 90) return { letter: 'A', color: 'text-emerald-600', bg: 'bg-emerald-100' }
   if (pct >= 80) return { letter: 'B', color: 'text-blue-600', bg: 'bg-blue-100' }
@@ -186,6 +331,9 @@ export default function IntegrationsPage() {
     if (connector.id === 'synergy') entries = parseSynergy(csvText, subject || 'General')
     else if (connector.id === 'ixl') entries = parseIXL(csvText)
     else if (connector.id === 'performance_matters') entries = parsePM(csvText)
+    else if (connector.id === 'canvas') entries = parseCanvas(csvText)
+    else if (connector.id === 'powerschool') entries = parsePowerSchool(csvText)
+    else if (connector.id === 'google_classroom') entries = parseGoogleClassroom(csvText)
     if (entries.length === 0) {
       toast('No valid entries found — double-check the format.', 'error')
       return
@@ -239,7 +387,7 @@ export default function IntegrationsPage() {
               Connect Your<br />School Platforms
             </h1>
             <p className="text-white/70 text-sm max-w-sm leading-relaxed">
-              Import grades from Synergy, IXL, and Performance Matters — everything in one dashboard.
+              Import grades from Synergy, IXL, Performance Matters, Canvas, PowerSchool, and Google Classroom — all in one dashboard.
             </p>
           </div>
           <div className="hidden sm:flex flex-col items-end gap-1.5 mt-2 shrink-0">
@@ -255,7 +403,7 @@ export default function IntegrationsPage() {
       </div>
 
       {/* Connector cards */}
-      <div className="grid sm:grid-cols-3 gap-5">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {CONNECTORS.map((conn) => {
           const rec = history[conn.id]
           const Icon = conn.Icon
@@ -271,12 +419,20 @@ export default function IntegrationsPage() {
                   <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-lg">
                     <Icon className="w-5 h-5 text-white" />
                   </div>
-                  {rec && (
-                    <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1">
-                      <Check className="w-3 h-3 text-white" />
-                      <span className="text-[10px] font-bold text-white">Imported</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1.5">
+                    {conn.isNew && !rec && (
+                      <div className="flex items-center gap-1 bg-gradient-to-r from-violet-500 to-fuchsia-500 rounded-full px-2.5 py-0.5 shadow-sm">
+                        <Sparkles className="w-2.5 h-2.5 text-white" />
+                        <span className="text-[10px] font-bold text-white">New</span>
+                      </div>
+                    )}
+                    {rec && (
+                      <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-sm rounded-full px-2.5 py-1">
+                        <Check className="w-3 h-3 text-white" />
+                        <span className="text-[10px] font-bold text-white">Imported</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -318,9 +474,9 @@ export default function IntegrationsPage() {
         <div>
           <h4 className="font-semibold text-gray-800 text-sm mb-1">How these integrations work</h4>
           <p className="text-xs text-gray-500 leading-relaxed">
-            Synergy, IXL, and Performance Matters don&apos;t offer public student APIs, so Study Hub uses a
-            guided CSV import flow. You copy your data from each platform, paste it here, and Study Hub
-            saves it to your Grades tracker automatically. More platforms (Canvas, PowerSchool, Google Classroom) coming soon.
+            Synergy, IXL, Performance Matters, Canvas, PowerSchool, and Google Classroom don&apos;t offer
+            public student APIs, so Study Hub uses a guided CSV import flow. You copy your data from each
+            platform, paste it here, and Study Hub saves it to your Grades tracker automatically.
           </p>
         </div>
       </div>
