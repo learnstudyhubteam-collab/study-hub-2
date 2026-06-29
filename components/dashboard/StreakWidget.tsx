@@ -12,6 +12,31 @@ interface Props {
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
+// Returns Mon–Sun of the current week, marking active/future/today
+function buildWeek(last7: { date: string; active: boolean }[]) {
+  const activeSet = new Set(last7.map((d) => d.date))
+  const today = new Date()
+  const todayKey = today.toISOString().split('T')[0]
+
+  // Find Monday of the current week (Mon = 1, so offset by (day - 1 + 7) % 7)
+  const dayOfWeek = today.getDay() // 0=Sun…6=Sat
+  const mondayOffset = (dayOfWeek + 6) % 7 // days since Monday
+  const monday = new Date(today)
+  monday.setDate(today.getDate() - mondayOffset)
+
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday)
+    d.setDate(monday.getDate() + i)
+    const key = d.toISOString().split('T')[0]
+    return {
+      date: key,
+      active: activeSet.has(key),
+      isFuture: key > todayKey,
+      isToday: key === todayKey,
+    }
+  })
+}
+
 export default function StreakWidget({ streak, totalDays, last7 }: Props) {
   return (
     <div className="glass rounded-2xl p-5 flex flex-col gap-4">
@@ -59,27 +84,26 @@ export default function StreakWidget({ streak, totalDays, last7 }: Props) {
         </div>
       </div>
 
-      {/* Last 7 days */}
+      {/* This week */}
       <div>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Last 7 days</p>
+        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">This week</p>
         <div className="grid grid-cols-7 gap-1">
-          {last7.map(({ date, active }) => {
-            const dayOfWeek = new Date(date + 'T12:00:00').getDay()
-            return (
-              <div key={date} className="flex flex-col items-center gap-1">
-                <div
-                  className={`w-full aspect-square rounded-lg transition-all ${
-                    active
-                      ? 'bg-gradient-to-br from-orange-400 to-rose-500 shadow-sm shadow-orange-200'
-                      : 'bg-gray-100'
-                  }`}
-                />
-                <span className="text-[9px] text-gray-400 font-medium">
-                  {DAY_LABELS[dayOfWeek]}
-                </span>
-              </div>
-            )
-          })}
+          {buildWeek(last7).map(({ date, active, isFuture, isToday }) => (
+            <div key={date} className="flex flex-col items-center gap-1">
+              <div
+                className={`w-full aspect-square rounded-lg transition-all ${
+                  isFuture
+                    ? 'bg-gray-50 border border-dashed border-gray-200'
+                    : active
+                    ? 'bg-gradient-to-br from-orange-400 to-rose-500 shadow-sm shadow-orange-200'
+                    : 'bg-gray-100'
+                }`}
+              />
+              <span className={`text-[9px] font-medium ${isToday ? 'text-orange-500 font-bold' : 'text-gray-400'}`}>
+                {isToday ? 'Today' : DAY_LABELS[new Date(date + 'T12:00:00').getDay()]}
+              </span>
+            </div>
+          ))}
         </div>
       </div>
     </div>
