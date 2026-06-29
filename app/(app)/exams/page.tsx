@@ -92,10 +92,11 @@ export default function ExamsPage() {
     <div className="space-y-6 animate-fade-up">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
-            <Clock className="w-6 h-6 text-electric" /> Exam Countdown
+          <h1 className="text-2xl font-extrabold flex items-center gap-2">
+            <Clock className="w-6 h-6 text-rose-500" />
+            <span className="bg-gradient-to-r from-rose-600 to-orange-500 bg-clip-text text-transparent">Exam Countdown</span>
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">Never miss an exam again</p>
+          <p className="text-rose-400 text-sm mt-0.5 font-medium">Never miss an exam again</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="btn-electric text-white text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add exam

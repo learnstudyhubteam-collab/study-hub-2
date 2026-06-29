@@ -70,10 +70,11 @@ export default function SchedulePage() {
     <div className="space-y-6 animate-fade-up">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
-            <CalendarClock className="w-6 h-6 text-electric" /> Study Schedule
+          <h1 className="text-2xl font-extrabold flex items-center gap-2">
+            <CalendarClock className="w-6 h-6 text-sky-500" />
+            <span className="bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent">Study Schedule</span>
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">AI-generated personalized study plans</p>
+          <p className="text-sky-500 text-sm mt-0.5 font-medium">AI-generated personalized study plans</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="btn-electric text-white text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5">
           <Sparkles className="w-4 h-4" /> Generate

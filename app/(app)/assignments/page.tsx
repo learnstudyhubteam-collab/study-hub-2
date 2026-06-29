@@ -112,13 +112,13 @@ export default function AssignmentsPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-200">
               <ClipboardList className="w-5 h-5 text-white" />
             </div>
-            Assignments
+            <span className="bg-gradient-to-r from-violet-600 to-purple-700 bg-clip-text text-transparent">Assignments</span>
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">Track your work and deadlines</p>
+          <p className="text-violet-400 text-sm mt-0.5 font-medium">Track your work and deadlines</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="btn-electric text-white text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5">
           <Plus className="w-4 h-4" /> Add assignment

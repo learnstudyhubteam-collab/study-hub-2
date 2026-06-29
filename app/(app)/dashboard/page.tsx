@@ -83,10 +83,10 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between animate-fade-up">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900">
+          <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
             Hey, {firstName} 👋
           </h1>
-          <p className="text-gray-500 mt-1 text-sm">What would you like to study today?</p>
+          <p className="text-indigo-400 mt-1 text-sm font-medium">What would you like to study today?</p>
         </div>
         <Link
           href="/study"
@@ -216,7 +216,7 @@ export default async function DashboardPage() {
         <ScrollReveal direction="up" delay={140}>
           <div className="glass rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+              <h2 className="font-bold text-amber-700 flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-500" />
                 Due today &amp; tomorrow
               </h2>
@@ -274,7 +274,7 @@ export default async function DashboardPage() {
         <ScrollReveal direction="left" delay={0}>
         <div className="glass rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="font-bold text-blue-700 flex items-center gap-2">
               <Clock className="w-4 h-4 text-electric" />
               Recent sessions
             </h2>
@@ -324,7 +324,7 @@ export default async function DashboardPage() {
         <ScrollReveal direction="right" delay={100}>
         <div className="glass rounded-2xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="font-bold text-violet-700 flex items-center gap-2">
               <Layers className="w-4 h-4 text-electric" />
               Flashcard decks
             </h2>

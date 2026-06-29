@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import LiquidBackground from '@/components/ui/LiquidBackground'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -71,8 +70,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}} />
       </head>
       <body className={`${inter.className} min-h-screen antialiased bg-[#F7FAFF]`}>
-        {/* Animated liquid flow canvas — renders behind every page */}
-        <LiquidBackground />
         {children}
       </body>
     </html>

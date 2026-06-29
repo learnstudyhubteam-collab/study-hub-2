@@ -97,10 +97,11 @@ export default function ClassesPage() {
     <div className="space-y-6 animate-fade-up">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
-            <GraduationCap className="w-6 h-6 text-electric" /> Classes
+          <h1 className="text-2xl font-extrabold flex items-center gap-2">
+            <GraduationCap className="w-6 h-6 text-indigo-500" />
+            <span className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">Classes</span>
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">{role === 'teacher' ? 'Manage your classes and students' : 'Your enrolled classes'}</p>
+          <p className="text-indigo-400 text-sm mt-0.5 font-medium">{role === 'teacher' ? 'Manage your classes and students' : 'Your enrolled classes'}</p>
         </div>
         <div className="flex gap-2">
           {role === 'teacher' ? (

@@ -118,13 +118,13 @@ export default function GradesPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-extrabold flex items-center gap-2">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-200">
               <Calculator className="w-5 h-5 text-white" />
             </div>
-            Grades
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">Grades</span>
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">Track your grades and GPA</p>
+          <p className="text-blue-400 text-sm mt-0.5 font-medium">Track your grades and GPA</p>
         </div>
         <div className="flex items-center gap-2">
           <Link href="/integrations" className="btn-glass px-3 py-2 rounded-xl text-sm font-semibold flex items-center gap-1.5 text-electric">

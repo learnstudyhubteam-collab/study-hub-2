@@ -61,8 +61,8 @@ export default function NewStudySessionPage() {
             <BookOpen className="w-5 h-5 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900">Start a study session</h1>
-            <p className="text-gray-500 text-sm">Enter your topic and choose how you want to study.</p>
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">Start a study session</h1>
+            <p className="text-blue-400 text-sm font-medium">Enter your topic and choose how you want to study.</p>
           </div>
         </div>
       </div>

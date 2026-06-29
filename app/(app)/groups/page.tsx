@@ -85,10 +85,11 @@ export default function GroupsPage() {
     <div className="space-y-6 animate-fade-up">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
-            <Users className="w-6 h-6 text-electric" /> Study Groups
+          <h1 className="text-2xl font-extrabold flex items-center gap-2">
+            <Users className="w-6 h-6 text-teal-500" />
+            <span className="bg-gradient-to-r from-teal-500 to-cyan-600 bg-clip-text text-transparent">Study Groups</span>
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">Collaborate with classmates</p>
+          <p className="text-teal-500 text-sm mt-0.5 font-medium">Collaborate with classmates</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => setShowJoin(true)} className="glass text-gray-700 text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 hover:bg-black/5 transition-colors">

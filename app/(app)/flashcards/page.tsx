@@ -86,8 +86,8 @@ export default function FlashcardsPage() {
             <Layers className="w-5 h-5 text-violet-500" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-gray-900">Flashcard decks</h1>
-            <p className="text-gray-500 text-sm">Create decks and study with spaced repetition.</p>
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent">Flashcard decks</h1>
+            <p className="text-violet-400 text-sm font-medium">Create decks and study with spaced repetition.</p>
           </div>
         </div>
         <Button

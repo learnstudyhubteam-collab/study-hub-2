@@ -63,10 +63,11 @@ export default function GuidesPage() {
     <div className="space-y-6 animate-fade-up">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
-            <FileText className="w-6 h-6 text-electric" /> Study Guides
+          <h1 className="text-2xl font-extrabold flex items-center gap-2">
+            <FileText className="w-6 h-6 text-amber-500" />
+            <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">Study Guides</span>
           </h1>
-          <p className="text-gray-500 text-sm mt-0.5">AI-generated comprehensive study guides</p>
+          <p className="text-amber-500 text-sm mt-0.5 font-medium">AI-generated comprehensive study guides</p>
         </div>
         <button onClick={() => setShowCreate(true)} className="btn-electric text-white text-sm font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5">
           <Sparkles className="w-4 h-4" /> Generate guide

@@ -67,10 +67,11 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 animate-fade-up max-w-lg">
       <div>
-        <h1 className="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
-          <Settings className="w-6 h-6 text-electric" /> Settings
+        <h1 className="text-2xl font-extrabold flex items-center gap-2">
+          <Settings className="w-6 h-6 text-slate-500" />
+          <span className="bg-gradient-to-r from-slate-700 to-blue-600 bg-clip-text text-transparent">Settings</span>
         </h1>
-        <p className="text-gray-500 text-sm mt-0.5">Manage your profile and preferences</p>
+        <p className="text-slate-500 text-sm mt-0.5 font-medium">Manage your profile and preferences</p>
       </div>
 
       <form onSubmit={save} className="space-y-5">
