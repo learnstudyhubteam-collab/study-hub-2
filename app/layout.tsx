@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import LiquidBackground from '@/components/ui/LiquidBackground'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#F8FBFF' },
+    { media: '(prefers-color-scheme: light)', color: '#F7FAFF' },
     { media: '(prefers-color-scheme: dark)', color: '#0A0F1E' },
   ],
 }
@@ -69,34 +70,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }
         `}} />
       </head>
-      <body className={`${inter.className} min-h-screen antialiased`}>
-        {/* Fixed liquid background — renders on every page */}
-        <div className="fixed inset-0 -z-10 overflow-hidden bg-[#F7FAFF]" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230066FF' fill-opacity='0.055'%3E%3Crect x='15' y='8' width='2.5' height='16'/%3E%3Crect x='8' y='15' width='16' height='2.5'/%3E%3C/g%3E%3C/svg%3E")`,
-          backgroundSize: '32px 32px',
-        }}>
-          {/* Primary blue blob — top right */}
-          <div className="liquid-blob bg-[#0066FF] w-[700px] h-[700px] opacity-[0.08]"
-            style={{ top: '-220px', right: '-180px', animation: 'liquidBlob 28s ease-in-out infinite' }} />
-          {/* Violet blob — bottom left */}
-          <div className="liquid-blob bg-[#7C3AED] w-[560px] h-[560px] opacity-[0.07]"
-            style={{ bottom: '-120px', left: '-140px', animation: 'liquidBlobAlt 36s ease-in-out infinite', animationDelay: '-8s' }} />
-          {/* Pink blob — center right */}
-          <div className="liquid-blob bg-[#EC4899] w-[340px] h-[340px] opacity-[0.055]"
-            style={{ top: '28%', right: '8%', animation: 'liquidBlobSlow 40s ease-in-out infinite', animationDelay: '-14s' }} />
-          {/* Teal blob — upper left */}
-          <div className="liquid-blob bg-[#0D9488] w-[280px] h-[280px] opacity-[0.05]"
-            style={{ top: '8%', left: '4%', animation: 'liquidBlob 24s ease-in-out infinite', animationDelay: '-5s' }} />
-          {/* Orange blob — lower center */}
-          <div className="liquid-blob bg-[#F97316] w-[220px] h-[220px] opacity-[0.04]"
-            style={{ bottom: '30%', left: '35%', animation: 'liquidBlobAlt 32s ease-in-out infinite', animationDelay: '-20s' }} />
-          {/* Indigo accent — lower right */}
-          <div className="liquid-blob bg-[#6366F1] w-[200px] h-[200px] opacity-[0.05]"
-            style={{ bottom: '10%', right: '4%', animation: 'liquidBlobAlt 20s ease-in-out infinite', animationDelay: '-12s' }} />
-          {/* Sky accent — mid left */}
-          <div className="liquid-blob bg-[#0EA5E9] w-[160px] h-[160px] opacity-[0.04]"
-            style={{ top: '52%', left: '2%', animation: 'liquidBlobSlow 30s ease-in-out infinite', animationDelay: '-7s' }} />
-        </div>
+      <body className={`${inter.className} min-h-screen antialiased bg-[#F7FAFF]`}>
+        {/* Animated liquid flow canvas — renders behind every page */}
+        <LiquidBackground />
         {children}
       </body>
     </html>
