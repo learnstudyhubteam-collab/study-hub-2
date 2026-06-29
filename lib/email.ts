@@ -1,7 +1,10 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
 const FROM = process.env.RESEND_FROM_EMAIL ?? 'Study Hub <noreply@studyhub.app>'
+
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY)
+}
 
 function baseTemplate(title: string, preheader: string, body: string) {
   return `<!DOCTYPE html>
@@ -107,7 +110,7 @@ export async function sendDailyDigest({
     ${sections}
   `
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: `📚 ${total} upcoming deadline${total !== 1 ? 's' : ''} — Study Hub`,
