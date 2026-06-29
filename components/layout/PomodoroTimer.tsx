@@ -61,7 +61,7 @@ export default function PomodoroTimer() {
       return
     }
     if (!originalTitle.current) originalTitle.current = document.title
-    const label = phase === 'work' ? '🍅 Focus' : '☕ Break'
+    const label = phase === 'work' ? '🎯 Focus' : '☕ Break'
     document.title = `${formatTime(secondsLeft)} ${label} — Study Hub`
   }, [running, secondsLeft, phase])
 
@@ -93,7 +93,7 @@ export default function PomodoroTimer() {
         onClick={() => setExpanded(e => !e)}
         className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 transition-colors text-left"
       >
-        <span className="text-base">{phase === 'work' ? '🍅' : '☕'}</span>
+        <span className="text-base">{phase === 'work' ? '🎯' : '☕'}</span>
         <span className="flex-1 text-xs font-medium text-white/70">
           {running ? `${formatTime(secondsLeft)} ${phase === 'work' ? 'Focus' : 'Break'}` : 'Pomodoro Timer'}
         </span>
