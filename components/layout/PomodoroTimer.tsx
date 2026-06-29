@@ -62,7 +62,7 @@ export default function PomodoroTimer() {
     }
     if (!originalTitle.current) originalTitle.current = document.title
     const label = phase === 'work' ? '🎯 Focus' : '☕ Break'
-    document.title = `${formatTime(secondsLeft)} ${label} — Study Hub`
+    document.title = `${formatTime(secondsLeft)} ${label} — Tutor AI`
   }, [running, secondsLeft, phase])
 
   function toggle() {

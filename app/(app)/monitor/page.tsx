@@ -93,7 +93,7 @@ export default async function ScreenMonitorPage() {
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Student Activity Monitor</h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Real-time view of what students are studying on Study Hub
+              Real-time view of what students are studying on Tutor AI
             </p>
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 border border-emerald-200">
@@ -217,7 +217,7 @@ export default async function ScreenMonitorPage() {
             <div>
               <h2 className="font-semibold text-gray-900">Lightspeed Classroom Integration</h2>
               <p className="text-sm text-gray-500 mt-0.5">
-                For full device-level screen visibility (not just Study Hub activity), integrate
+                For full device-level screen visibility (not just Tutor AI activity), integrate
                 Lightspeed Classroom — an MDM-based tool that lets teachers see and control
                 student screens across all apps, not just this one.
               </p>
@@ -238,7 +238,7 @@ export default async function ScreenMonitorPage() {
               {
                 step: '3',
                 title: 'Use Both',
-                desc: 'Use this page to see what students are studying inside Study Hub, and Lightspeed for full OS-level visibility across all apps.',
+                desc: 'Use this page to see what students are studying inside Tutor AI, and Lightspeed for full OS-level visibility across all apps.',
               },
             ].map((item) => (
               <div key={item.step} className="p-4 rounded-xl bg-violet-50 space-y-1.5">

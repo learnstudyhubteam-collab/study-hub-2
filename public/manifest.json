@@ -1,6 +1,6 @@
 {
-  "name": "Study Hub",
-  "short_name": "Study Hub",
+  "name": "Tutor AI",
+  "short_name": "Tutor AI",
   "description": "AI-powered learning platform for students and teachers",
   "start_url": "/dashboard",
   "scope": "/",

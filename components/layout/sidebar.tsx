@@ -160,7 +160,7 @@ export default function Sidebar({ plan = 'free', role = 'student' }: SidebarProp
             <Zap className="w-4 h-4 text-white" fill="white" />
           </div>
           <div>
-            <span className="text-base font-bold text-gradient">Study Hub</span>
+            <span className="text-base font-bold text-gradient">Tutor AI</span>
             {role !== 'student' && (
               <div className={`text-[9px] font-bold uppercase tracking-widest leading-none ${role === 'admin' ? 'text-red-500' : 'text-violet-500'}`}>
                 {role}
@@ -278,7 +278,7 @@ export default function Sidebar({ plan = 'free', role = 'student' }: SidebarProp
           <div className="w-7 h-7 rounded-lg bg-electric-gradient flex items-center justify-center shadow-electric">
             <Zap className="w-3.5 h-3.5 text-white" fill="white" />
           </div>
-          <span className="text-sm font-bold text-gradient">Study Hub</span>
+          <span className="text-sm font-bold text-gradient">Tutor AI</span>
         </Link>
         <div className="flex items-center gap-2">
           <button

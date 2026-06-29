@@ -254,21 +254,6 @@ export default async function AdminDashboardPage() {
         </div>
       </ScrollReveal>
 
-      {/* Legal notice */}
-      <ScrollReveal delay={0.25}>
-        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <p className="text-sm font-semibold text-amber-800">Trademark Notice</p>
-            <p className="text-xs text-amber-700">
-              A separate company called "Study Hub" (studyhub.com) offers a similar educational platform.
-              Before scaling or marketing this product, consult a trademark attorney to assess any brand
-              conflict and consider whether a name differentiation (e.g. "StudyHub Pro", "LearnHub", etc.)
-              is advisable.
-            </p>
-          </div>
-        </div>
-      </ScrollReveal>
     </div>
   )
 }

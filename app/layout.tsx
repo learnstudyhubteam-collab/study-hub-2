@@ -9,14 +9,14 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Study Hub — AI-Powered Learning',
+  title: 'Tutor AI — AI-Powered Learning',
   description:
     'Study any subject with an AI tutor. Flashcards, quizzes, step-by-step problem solving, and more.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Study Hub',
+    title: 'Tutor AI',
     startupImage: [
       { url: '/splash/splash-750x1334.png', media: '(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)' },
       { url: '/splash/splash-1125x2436.png', media: '(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)' },
@@ -55,9 +55,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Study Hub" />
+        <meta name="apple-mobile-web-app-title" content="Tutor AI" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="application-name" content="Study Hub" />
+        <meta name="application-name" content="Tutor AI" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16.png" />

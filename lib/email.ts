@@ -1,6 +1,6 @@
 import { Resend } from 'resend'
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? 'Study Hub <noreply@studyhub.app>'
+const FROM = process.env.RESEND_FROM_EMAIL ?? 'Tutor AI <noreply@studyhub.app>'
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY)
@@ -40,10 +40,10 @@ function baseTemplate(title: string, preheader: string, body: string) {
       <div class="logo-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       </div>
-      <span class="logo-text">Study Hub</span>
+      <span class="logo-text">Tutor AI</span>
     </div>
     ${body}
-    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://study-hub-2.vercel.app'}/dashboard" class="btn">Open Study Hub →</a>
+    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://study-hub-2.vercel.app'}/dashboard" class="btn">Open Tutor AI →</a>
   </div>
   <div class="footer">
     You&rsquo;re receiving this because you have upcoming deadlines.<br/>
@@ -105,7 +105,7 @@ export async function sendDailyDigest({
   const total = exams.length + assignments.length
   const body = `
     <h1>Hey ${firstName}, you have ${total} deadline${total !== 1 ? 's' : ''} coming up</h1>
-    <p>Here&rsquo;s your daily Study Hub digest so nothing slips through the cracks.</p>
+    <p>Here&rsquo;s your daily Tutor AI digest so nothing slips through the cracks.</p>
     <div class="divider"></div>
     ${sections}
   `
@@ -113,7 +113,7 @@ export async function sendDailyDigest({
   await getResend().emails.send({
     from: FROM,
     to,
-    subject: `📚 ${total} upcoming deadline${total !== 1 ? 's' : ''} — Study Hub`,
-    html: baseTemplate('Study Hub Daily Digest', `You have ${total} upcoming deadline${total !== 1 ? 's' : ''}`, body),
+    subject: `📚 ${total} upcoming deadline${total !== 1 ? 's' : ''} — Tutor AI`,
+    html: baseTemplate('Tutor AI Daily Digest', `You have ${total} upcoming deadline${total !== 1 ? 's' : ''}`, body),
   })
 }

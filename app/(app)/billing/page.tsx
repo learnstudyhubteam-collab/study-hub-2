@@ -54,7 +54,7 @@ export default async function BillingPage() {
               Current plan
             </p>
             <p className={`text-2xl font-extrabold ${isActive ? 'text-white' : 'text-gray-900'}`}>
-              Study Hub {current.name}
+              Tutor AI {current.name}
             </p>
             {isActive && <p className="text-white/70 text-sm mt-1">{current.price} / month</p>}
           </div>

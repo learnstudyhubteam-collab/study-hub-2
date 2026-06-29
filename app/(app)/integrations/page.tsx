@@ -475,8 +475,8 @@ export default function IntegrationsPage() {
           <h4 className="font-semibold text-gray-800 text-sm mb-1">How these integrations work</h4>
           <p className="text-xs text-gray-500 leading-relaxed">
             Synergy, IXL, Performance Matters, Canvas, PowerSchool, and Google Classroom don&apos;t offer
-            public student APIs, so Study Hub uses a guided CSV import flow. You copy your data from each
-            platform, paste it here, and Study Hub saves it to your Grades tracker automatically.
+            public student APIs, so Tutor AI uses a guided CSV import flow. You copy your data from each
+            platform, paste it here, and Tutor AI saves it to your Grades tracker automatically.
           </p>
         </div>
       </div>

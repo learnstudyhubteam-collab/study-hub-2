@@ -35,7 +35,7 @@ export default function Navbar({ isPro = false }: NavbarProps) {
             <div className="w-7 h-7 rounded-lg bg-electric-gradient flex items-center justify-center shadow-electric group-hover:shadow-electric-lg transition-shadow">
               <Zap className="w-4 h-4 text-white" fill="white" />
             </div>
-            <span className="text-base font-bold text-gradient">Study Hub</span>
+            <span className="text-base font-bold text-gradient">Tutor AI</span>
           </Link>
 
           {/* Nav links */}
