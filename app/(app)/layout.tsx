@@ -13,14 +13,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const [plan, { data: profile }] = await Promise.all([
     getUserPlan(),
-    supabase.from('profiles').select('onboarding_completed').eq('id', user.id).single(),
+    supabase.from('profiles').select('onboarding_completed, role').eq('id', user.id).single(),
   ])
 
   const needsOnboarding = !profile?.onboarding_completed
+  const role = (profile?.role ?? 'student') as 'student' | 'teacher' | 'admin'
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar plan={plan} />
+      <Sidebar plan={plan} role={role} />
       <div className="flex-1 flex flex-col min-w-0">
         <main className="flex-1 px-4 sm:px-6 py-8 max-w-5xl w-full mx-auto pb-24 lg:pb-8">
           {children}

@@ -7,14 +7,15 @@ import {
   Zap, LayoutDashboard, BookOpen, Layers, CreditCard, LogOut,
   GraduationCap, ClipboardList, Calculator, Clock, CalendarClock,
   Users, FileText, Menu, X, Sparkles, Settings, Command, Link2, Sigma,
+  Shield, Monitor, Megaphone, BarChart3,
 } from 'lucide-react'
 import { useState } from 'react'
 import PomodoroTimer from '@/components/layout/PomodoroTimer'
 
 import type { SubscriptionPlan } from '@/lib/tier'
-interface SidebarProps { plan?: SubscriptionPlan }
+interface SidebarProps { plan?: SubscriptionPlan; role?: 'student' | 'teacher' | 'admin' }
 
-const navGroups = [
+const studentNavGroups = [
   {
     label: 'General',
     color: 'text-blue-500',
@@ -59,6 +60,69 @@ const navGroups = [
   },
 ]
 
+const teacherNavGroups = [
+  {
+    label: 'Teacher',
+    color: 'text-violet-500',
+    items: [
+      { href: '/teacher', label: 'Teacher Dashboard', icon: GraduationCap },
+      { href: '/monitor', label: 'Screen Monitor', icon: Monitor },
+    ],
+  },
+  {
+    label: 'Classroom',
+    color: 'text-blue-500',
+    items: [
+      { href: '/classes', label: 'My Classes', icon: BookOpen },
+      { href: '/assignments', label: 'Assignments', icon: ClipboardList },
+      { href: '/grades', label: 'Grades', icon: BarChart3 },
+    ],
+  },
+  {
+    label: 'Students',
+    color: 'text-emerald-500',
+    items: [
+      { href: '/groups', label: 'Study Groups', icon: Users },
+      { href: '/exams', label: 'Exams', icon: Clock },
+    ],
+  },
+  {
+    label: 'Tools',
+    color: 'text-orange-500',
+    items: [
+      { href: '/calculator', label: 'Calculator', icon: Sigma },
+    ],
+  },
+]
+
+const adminNavGroups = [
+  {
+    label: 'Admin',
+    color: 'text-red-500',
+    items: [
+      { href: '/admin', label: 'Admin Dashboard', icon: Shield },
+      { href: '/admin/users', label: 'User Management', icon: Users },
+      { href: '/monitor', label: 'Screen Monitor', icon: Monitor },
+    ],
+  },
+  {
+    label: 'School',
+    color: 'text-violet-500',
+    items: [
+      { href: '/admin/announcements/new', label: 'Announcements', icon: Megaphone },
+      { href: '/classes', label: 'All Classes', icon: GraduationCap },
+      { href: '/assignments', label: 'Assignments', icon: ClipboardList },
+    ],
+  },
+  {
+    label: 'Tools',
+    color: 'text-orange-500',
+    items: [
+      { href: '/calculator', label: 'Calculator', icon: Sigma },
+    ],
+  },
+]
+
 const mobileBottomTabs = [
   { href: '/dashboard', label: 'Home', icon: LayoutDashboard },
   { href: '/study', label: 'AI Chat', icon: BookOpen },
@@ -71,8 +135,9 @@ function openCommandPalette() {
   window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))
 }
 
-export default function Sidebar({ plan = 'free' }: SidebarProps) {
+export default function Sidebar({ plan = 'free', role = 'student' }: SidebarProps) {
   const isPaid = plan === 'plus' || plan === 'pro'
+  const navGroups = role === 'admin' ? adminNavGroups : role === 'teacher' ? teacherNavGroups : studentNavGroups
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -92,7 +157,14 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
           <div className="w-8 h-8 rounded-xl bg-electric-gradient flex items-center justify-center shadow-electric group-hover:shadow-electric-lg transition-all">
             <Zap className="w-4 h-4 text-white" fill="white" />
           </div>
-          <span className="text-base font-bold text-gradient">Study Hub</span>
+          <div>
+            <span className="text-base font-bold text-gradient">Study Hub</span>
+            {role !== 'student' && (
+              <div className={`text-[9px] font-bold uppercase tracking-widest leading-none ${role === 'admin' ? 'text-red-500' : 'text-violet-500'}`}>
+                {role}
+              </div>
+            )}
+          </div>
         </Link>
       </div>
 
