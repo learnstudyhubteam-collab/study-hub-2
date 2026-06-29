@@ -31,14 +31,33 @@ export default async function OverduePage() {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role, full_name')
+    .select('role, full_name, school, county')
     .eq('id', user.id)
     .single()
 
   if (profile?.role !== 'teacher' && profile?.role !== 'admin') redirect('/dashboard')
 
   const isAdmin = profile?.role === 'admin'
+  const userSchool = profile?.school ?? null
   const now = new Date().toISOString()
+
+  const userCounty = profile?.county ?? null
+
+  // Get student IDs scoped to the same school and/or county
+  let schoolStudentIds: string[] | null = null
+  if (userSchool || userCounty) {
+    let studentQuery = supabase
+      .from('profiles')
+      .select('id')
+      .eq('role', 'student')
+    if (userSchool) studentQuery = studentQuery.eq('school', userSchool)
+    if (userCounty) studentQuery = studentQuery.eq('county', userCounty)
+    const { data: schoolStudents } = await studentQuery
+    schoolStudentIds = (schoolStudents ?? []).map((s) => s.id)
+    if (schoolStudentIds.length === 0) {
+      return <EmptyState role={profile?.role} school={userSchool} county={userCounty} noStudents />
+    }
+  }
 
   let classIds: string[] = []
   if (!isAdmin) {
@@ -47,22 +66,25 @@ export default async function OverduePage() {
       .select('id')
       .eq('teacher_id', user.id)
     classIds = (myClasses ?? []).map((c) => c.id)
-    if (classIds.length === 0) return <EmptyState role={profile?.role} />
+    if (classIds.length === 0) return <EmptyState role={profile?.role} school={userSchool} county={userCounty} />
   }
 
-  // Build two separate queries — no .clone() needed
-  const buildBase = () =>
-    supabase
+  // Build two separate queries scoped to school + role
+  const buildBase = () => {
+    let q = supabase
       .from('assignments')
       .select(SELECT)
       .order('due_date', { ascending: true })
-
-  const applyScope = (q: ReturnType<typeof buildBase>) =>
-    isAdmin ? q : q.in('class_id', classIds)
+    // Scope to teacher's classes
+    if (!isAdmin && classIds.length > 0) q = q.in('class_id', classIds)
+    // Scope to school students
+    if (schoolStudentIds) q = q.in('user_id', schoolStudentIds)
+    return q
+  }
 
   const [{ data: overdue }, { data: pendingLate }] = await Promise.all([
-    applyScope(buildBase()).eq('status', 'overdue').limit(100),
-    applyScope(buildBase())
+    buildBase().eq('status', 'overdue').limit(100),
+    buildBase()
       .in('status', ['pending', 'in_progress'])
       .not('due_date', 'is', null)
       .lte('due_date', now)
@@ -151,7 +173,8 @@ export default async function OverduePage() {
             </h1>
             <p className="text-sm text-gray-500 mt-0.5">
               {allAtRisk.length} item{allAtRisk.length !== 1 ? 's' : ''} overdue across {studentList.length} student{studentList.length !== 1 ? 's' : ''}
-              {isAdmin ? ' (platform-wide)' : ' (your classes)'}
+              {userSchool ? ` · ${userSchool}` : ''}
+              {userCounty ? ` · ${userCounty}` : ''}
             </p>
           </div>
         </div>
@@ -342,7 +365,18 @@ export default async function OverduePage() {
   )
 }
 
-function EmptyState({ role }: { role?: string | null }) {
+function EmptyState({
+  role,
+  school,
+  county,
+  noStudents,
+}: {
+  role?: string | null
+  school?: string | null
+  county?: string | null
+  noStudents?: boolean
+}) {
+  const scopeLabel = [school, county].filter(Boolean).join(' · ')
   return (
     <div className="space-y-6">
       <Link
@@ -354,14 +388,28 @@ function EmptyState({ role }: { role?: string | null }) {
       </Link>
       <div className="glass rounded-2xl p-12 text-center">
         <GraduationCap className="w-10 h-10 text-gray-200 mx-auto mb-3" />
-        <h2 className="text-lg font-semibold text-gray-900 mb-1">No classes yet</h2>
-        <p className="text-sm text-gray-400 mb-4">Create a class first to track student assignments.</p>
-        <Link
-          href="/classes"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl btn-electric text-white text-sm font-medium"
-        >
-          Go to Classes
-        </Link>
+        {noStudents ? (
+          <>
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">No students found</h2>
+            <p className="text-sm text-gray-400 mb-1">
+              No students are registered{scopeLabel ? ` at ${scopeLabel}` : ''} yet.
+            </p>
+            <p className="text-xs text-gray-300">Make sure your school and county are set in Settings.</p>
+          </>
+        ) : (
+          <>
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">No classes yet</h2>
+            <p className="text-sm text-gray-400 mb-4">
+              Create a class first to track student assignments{scopeLabel ? ` at ${scopeLabel}` : ''}.
+            </p>
+            <Link
+              href="/classes"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl btn-electric text-white text-sm font-medium"
+            >
+              Go to Classes
+            </Link>
+          </>
+        )}
       </div>
     </div>
   )
