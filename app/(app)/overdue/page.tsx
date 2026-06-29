@@ -3,11 +3,13 @@ import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import {
   AlertTriangle, ArrowLeft, Clock, BookOpen, Users,
-  ChevronRight, GraduationCap, Shield, Calendar, User,
+  ChevronRight, GraduationCap, Shield, Calendar,
 } from 'lucide-react'
 import ScrollReveal from '@/components/ui/scroll-reveal'
 
 export const dynamic = 'force-dynamic'
+
+const SELECT = 'id, title, subject, due_date, priority, status, class_id, user_id, profiles(full_name, email, school), classes(name, subject)'
 
 type OverdueAssignment = {
   id: string
@@ -38,38 +40,29 @@ export default async function OverduePage() {
   const isAdmin = profile?.role === 'admin'
   const now = new Date().toISOString()
 
-  // For teachers: only show assignments in their classes
-  // For admins: show all overdue assignments platform-wide
-  let query = supabase
-    .from('assignments')
-    .select('id, title, subject, due_date, priority, status, class_id, user_id, profiles(full_name, email, school), classes(name, subject)')
-    .order('due_date', { ascending: true })
-
+  let classIds: string[] = []
   if (!isAdmin) {
-    // Get the teacher's class IDs first
     const { data: myClasses } = await supabase
       .from('classes')
       .select('id')
       .eq('teacher_id', user.id)
-
-    const classIds = (myClasses ?? []).map((c) => c.id)
-
-    if (classIds.length === 0) {
-      // No classes, show empty state
-      return <EmptyState role={profile?.role} />
-    }
-
-    query = query.in('class_id', classIds)
+    classIds = (myClasses ?? []).map((c) => c.id)
+    if (classIds.length === 0) return <EmptyState role={profile?.role} />
   }
 
-  // Fetch overdue (past due + not completed) AND pending/in-progress (upcoming at risk)
-  const [{ data: overdue }, { data: pending }] = await Promise.all([
-    query
-      .clone()
-      .eq('status', 'overdue')
-      .limit(100),
-    query
-      .clone()
+  // Build two separate queries — no .clone() needed
+  const buildBase = () =>
+    supabase
+      .from('assignments')
+      .select(SELECT)
+      .order('due_date', { ascending: true })
+
+  const applyScope = (q: ReturnType<typeof buildBase>) =>
+    isAdmin ? q : q.in('class_id', classIds)
+
+  const [{ data: overdue }, { data: pendingLate }] = await Promise.all([
+    applyScope(buildBase()).eq('status', 'overdue').limit(100),
+    applyScope(buildBase())
       .in('status', ['pending', 'in_progress'])
       .not('due_date', 'is', null)
       .lte('due_date', now)
@@ -77,19 +70,24 @@ export default async function OverduePage() {
   ])
 
   const overdueItems = (overdue ?? []) as unknown as OverdueAssignment[]
-  const pendingLate = (pending ?? []) as unknown as OverdueAssignment[]
+  const pendingItems = (pendingLate ?? []) as unknown as OverdueAssignment[]
 
-  // Combine and deduplicate
-  const allAtRisk = [
-    ...overdueItems,
-    ...pendingLate.filter((p) => !overdueItems.find((o) => o.id === p.id)),
-  ].sort((a, b) => {
+  // Combine, deduplicate, sort oldest first
+  const seen = new Set<string>()
+  const allAtRisk: OverdueAssignment[] = []
+  for (const item of [...overdueItems, ...pendingItems]) {
+    if (!seen.has(item.id)) {
+      seen.add(item.id)
+      allAtRisk.push(item)
+    }
+  }
+  allAtRisk.sort((a, b) => {
     if (!a.due_date) return 1
     if (!b.due_date) return -1
     return new Date(a.due_date).getTime() - new Date(b.due_date).getTime()
   })
 
-  // Group by student
+  // Group by student, sorted by most overdue
   const byStudent: Record<string, { name: string; email: string; school: string | null; items: OverdueAssignment[] }> = {}
   for (const item of allAtRisk) {
     const uid = item.user_id
@@ -103,10 +101,12 @@ export default async function OverduePage() {
     }
     byStudent[uid].items.push(item)
   }
+  const studentList = Object.entries(byStudent).sort((a, b) => b[1].items.length - a[1].items.length)
 
-  const studentList = Object.entries(byStudent).sort((a, b) =>
-    b[1].items.length - a[1].items.length
-  )
+  const daysOverdue = (dateStr: string | null) => {
+    if (!dateStr) return null
+    return Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24))
+  }
 
   const priorityDot: Record<string, string> = {
     high: 'bg-red-500',
@@ -114,11 +114,14 @@ export default async function OverduePage() {
     low: 'bg-gray-300',
   }
 
-  const daysOverdue = (dateStr: string | null) => {
-    if (!dateStr) return null
-    const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24))
-    return diff
+  const priorityBadge: Record<string, string> = {
+    high: 'bg-red-100 text-red-700',
+    medium: 'bg-amber-100 text-amber-700',
+    low: 'bg-gray-100 text-gray-500',
   }
+
+  const overdayColor = (days: number) =>
+    days > 7 ? 'text-red-600' : days > 3 ? 'text-orange-500' : 'text-amber-500'
 
   return (
     <div className="space-y-8">
@@ -158,27 +161,12 @@ export default async function OverduePage() {
       <ScrollReveal delay={0.05}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            {
-              label: 'Total Overdue',
-              value: allAtRisk.length,
-              icon: AlertTriangle,
-              color: 'text-red-500 bg-red-50',
-            },
-            {
-              label: 'Students Affected',
-              value: studentList.length,
-              icon: Users,
-              color: 'text-orange-500 bg-orange-50',
-            },
-            {
-              label: 'High Priority',
-              value: allAtRisk.filter((a) => a.priority === 'high').length,
-              icon: Clock,
-              color: 'text-red-600 bg-red-50',
-            },
+            { label: 'Total Overdue', value: allAtRisk.length, icon: AlertTriangle, color: 'text-red-500 bg-red-50' },
+            { label: 'Students Affected', value: studentList.length, icon: Users, color: 'text-orange-500 bg-orange-50' },
+            { label: 'High Priority', value: allAtRisk.filter((a) => a.priority === 'high').length, icon: Clock, color: 'text-red-600 bg-red-50' },
             {
               label: 'Oldest (days)',
-              value: Math.max(0, ...allAtRisk.map((a) => daysOverdue(a.due_date) ?? 0)),
+              value: allAtRisk.length > 0 ? Math.max(0, ...allAtRisk.map((a) => daysOverdue(a.due_date) ?? 0)) : 0,
               icon: Calendar,
               color: 'text-gray-500 bg-gray-50',
             },
@@ -188,7 +176,7 @@ export default async function OverduePage() {
             return (
               <div key={s.label} className="glass rounded-2xl p-4 space-y-2">
                 <div className={`w-9 h-9 rounded-xl ${iconBg} flex items-center justify-center`}>
-                  <Icon className={`w-4.5 h-4.5 ${iconColor}`} />
+                  <Icon className={`w-4 h-4 ${iconColor}`} />
                 </div>
                 <p className="text-2xl font-bold text-gray-900">{s.value}</p>
                 <p className="text-xs text-gray-500 font-medium">{s.label}</p>
@@ -205,20 +193,19 @@ export default async function OverduePage() {
               <BookOpen className="w-7 h-7 text-emerald-500" />
             </div>
             <h2 className="text-lg font-semibold text-gray-900 mb-1">All caught up!</h2>
-            <p className="text-sm text-gray-400">No overdue assignments found. Great work from your students.</p>
+            <p className="text-sm text-gray-400">No overdue assignments found.</p>
           </div>
         </ScrollReveal>
       ) : (
         <>
-          {/* By-student breakdown */}
+          {/* Per-student accordion */}
           <ScrollReveal delay={0.1}>
             <div className="glass rounded-2xl p-5 space-y-4">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
                 <Users className="w-4 h-4 text-red-500" />
                 By Student
-                <span className="ml-auto text-xs font-normal text-gray-400">Sorted by most overdue items</span>
+                <span className="ml-auto text-xs font-normal text-gray-400">Most overdue first</span>
               </h2>
-
               <div className="space-y-3">
                 {studentList.map(([uid, student]) => (
                   <details key={uid} className="group rounded-2xl border border-gray-100 overflow-hidden">
@@ -241,7 +228,6 @@ export default async function OverduePage() {
                         <ChevronRight className="w-4 h-4 text-gray-400 transition-transform group-open:rotate-90" />
                       </div>
                     </summary>
-
                     <div className="border-t border-gray-100 divide-y divide-gray-50">
                       {student.items.map((item) => {
                         const days = daysOverdue(item.due_date)
@@ -265,15 +251,11 @@ export default async function OverduePage() {
                             </div>
                             <div className="text-right shrink-0 space-y-1">
                               {days !== null && (
-                                <p className={`text-xs font-bold ${days > 7 ? 'text-red-600' : days > 3 ? 'text-orange-500' : 'text-amber-500'}`}>
+                                <p className={`text-xs font-bold ${overdayColor(days)}`}>
                                   {days === 0 ? 'Due today' : `${days}d overdue`}
                                 </p>
                               )}
-                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                                item.priority === 'high' ? 'bg-red-100 text-red-700'
-                                : item.priority === 'medium' ? 'bg-amber-100 text-amber-700'
-                                : 'bg-gray-100 text-gray-500'
-                              }`}>
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${priorityBadge[item.priority] ?? 'bg-gray-100 text-gray-500'}`}>
                                 {item.priority}
                               </span>
                             </div>
@@ -287,7 +269,7 @@ export default async function OverduePage() {
             </div>
           </ScrollReveal>
 
-          {/* Flat list by assignment */}
+          {/* Flat table */}
           <ScrollReveal delay={0.15}>
             <div className="glass rounded-2xl p-5 space-y-4">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
@@ -295,17 +277,15 @@ export default async function OverduePage() {
                 All Overdue Items
                 <span className="ml-auto text-xs font-normal text-gray-400">Oldest first</span>
               </h2>
-
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-100">
-                      <th className="text-left px-2 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Assignment</th>
-                      <th className="text-left px-2 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Student</th>
-                      <th className="text-left px-2 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Class</th>
-                      <th className="text-left px-2 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Due</th>
-                      <th className="text-left px-2 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Overdue</th>
-                      <th className="text-left px-2 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">Priority</th>
+                      {['Assignment', 'Student', 'Class', 'Due', 'Overdue', 'Priority'].map((h) => (
+                        <th key={h} className="text-left px-2 py-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          {h}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
@@ -315,9 +295,7 @@ export default async function OverduePage() {
                         <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
                           <td className="px-2 py-3">
                             <p className="font-medium text-gray-900 max-w-[160px] truncate">{item.title}</p>
-                            {item.subject && (
-                              <p className="text-xs text-gray-400 mt-0.5">{item.subject}</p>
-                            )}
+                            {item.subject && <p className="text-xs text-gray-400 mt-0.5">{item.subject}</p>}
                           </td>
                           <td className="px-2 py-3">
                             <div className="flex items-center gap-2">
@@ -327,44 +305,26 @@ export default async function OverduePage() {
                                 </span>
                               </div>
                               <div>
-                                <p className="text-xs font-medium text-gray-900">
-                                  {item.profiles?.full_name ?? 'Unknown'}
-                                </p>
+                                <p className="text-xs font-medium text-gray-900">{item.profiles?.full_name ?? 'Unknown'}</p>
                                 {isAdmin && item.profiles?.school && (
                                   <p className="text-[10px] text-gray-400">{item.profiles.school}</p>
                                 )}
                               </div>
                             </div>
                           </td>
-                          <td className="px-2 py-3">
-                            <p className="text-xs text-gray-500">
-                              {item.classes?.name ?? '—'}
-                            </p>
-                          </td>
-                          <td className="px-2 py-3">
-                            <p className="text-xs text-gray-500">
-                              {item.due_date
-                                ? new Date(item.due_date).toLocaleDateString()
-                                : '—'}
-                            </p>
+                          <td className="px-2 py-3 text-xs text-gray-500">{item.classes?.name ?? '—'}</td>
+                          <td className="px-2 py-3 text-xs text-gray-500">
+                            {item.due_date ? new Date(item.due_date).toLocaleDateString() : '—'}
                           </td>
                           <td className="px-2 py-3">
                             {days !== null ? (
-                              <span className={`text-xs font-bold ${
-                                days > 7 ? 'text-red-600'
-                                : days > 3 ? 'text-orange-500'
-                                : 'text-amber-500'
-                              }`}>
+                              <span className={`text-xs font-bold ${overdayColor(days)}`}>
                                 {days === 0 ? 'Today' : `${days}d`}
                               </span>
                             ) : '—'}
                           </td>
                           <td className="px-2 py-3">
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                              item.priority === 'high' ? 'bg-red-100 text-red-700'
-                              : item.priority === 'medium' ? 'bg-amber-100 text-amber-700'
-                              : 'bg-gray-100 text-gray-500'
-                            }`}>
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${priorityBadge[item.priority] ?? 'bg-gray-100 text-gray-500'}`}>
                               {item.priority}
                             </span>
                           </td>
