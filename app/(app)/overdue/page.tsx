@@ -6,7 +6,6 @@ import {
   ChevronRight, GraduationCap, Shield, Calendar, User,
 } from 'lucide-react'
 import ScrollReveal from '@/components/ui/scroll-reveal'
-import OverdueFilters from '@/components/overdue/OverdueFilters'
 
 export const dynamic = 'force-dynamic'
 
