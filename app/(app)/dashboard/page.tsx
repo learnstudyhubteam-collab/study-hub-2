@@ -5,7 +5,7 @@ import { logActivity, getStreakData } from '@/lib/activity'
 import UpgradeBanner from '@/components/billing/UpgradeBanner'
 import StreakWidget from '@/components/dashboard/StreakWidget'
 import ScrollReveal from '@/components/ui/scroll-reveal'
-import { BookOpen, Layers, Zap, ArrowRight, Clock, ChevronRight, AlertTriangle, CalendarClock } from 'lucide-react'
+import { BookOpen, Layers, Zap, ArrowRight, Clock, ChevronRight, AlertTriangle, CalendarClock, Flame, ClipboardList, Link2 } from 'lucide-react'
 import type { StudySession, FlashcardDeck } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -97,6 +97,63 @@ export default async function DashboardPage() {
         </Link>
       </div>
 
+      {/* Stats row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          {
+            value: streakData.streak,
+            label: 'Day Streak',
+            icon: Flame,
+            gradient: 'from-orange-400 to-rose-500',
+            shadow: 'shadow-orange-200',
+            suffix: streakData.streak === 1 ? ' day' : ' days',
+          },
+          {
+            value: streakData.totalDays,
+            label: 'Study Days',
+            icon: CalendarClock,
+            gradient: 'from-blue-500 to-indigo-600',
+            shadow: 'shadow-blue-200',
+            suffix: '',
+          },
+          {
+            value: sessions?.length ?? 0,
+            label: 'Sessions',
+            icon: BookOpen,
+            gradient: 'from-violet-500 to-purple-600',
+            shadow: 'shadow-violet-200',
+            suffix: (sessions?.length ?? 0) >= 5 ? '+' : '',
+          },
+          {
+            value: (urgentAssignments?.length ?? 0) + (urgentExams?.length ?? 0),
+            label: 'Due Soon',
+            icon: ClipboardList,
+            gradient: (urgentAssignments?.length ?? 0) + (urgentExams?.length ?? 0) > 0
+              ? 'from-amber-400 to-orange-500'
+              : 'from-emerald-400 to-teal-500',
+            shadow: (urgentAssignments?.length ?? 0) + (urgentExams?.length ?? 0) > 0
+              ? 'shadow-amber-200'
+              : 'shadow-emerald-200',
+            suffix: '',
+          },
+        ].map((stat, i) => {
+          const Icon = stat.icon
+          return (
+            <ScrollReveal key={stat.label} direction="up" delay={i * 60}>
+              <div className="glass-card p-4">
+                <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center mb-3 shadow-md ${stat.shadow}`}>
+                  <Icon className="w-4 h-4 text-white" />
+                </div>
+                <p className="text-2xl font-black text-gray-900 leading-none">
+                  {stat.value}{stat.suffix}
+                </p>
+                <p className="text-xs text-gray-500 mt-1 font-medium">{stat.label}</p>
+              </div>
+            </ScrollReveal>
+          )
+        })}
+      </div>
+
       {/* Upgrade banner */}
       {!proUser && (
         <ScrollReveal direction="up" delay={80}>
@@ -110,26 +167,26 @@ export default async function DashboardPage() {
           {
             href: '/study',
             icon: BookOpen,
-            color: 'text-blue-500',
-            bg: 'bg-blue-500/10',
+            gradient: 'from-blue-500 to-indigo-600',
+            shadow: 'shadow-blue-200',
             title: 'Start a study session',
             desc: 'Pick a topic and mode',
           },
           {
             href: '/flashcards',
             icon: Layers,
-            color: 'text-violet-500',
-            bg: 'bg-violet-500/10',
+            gradient: 'from-violet-500 to-purple-600',
+            shadow: 'shadow-violet-200',
             title: 'My flashcard decks',
             desc: 'Review and quiz yourself',
           },
           {
-            href: '/billing',
-            icon: Zap,
-            color: proUser ? 'text-electric' : 'text-amber-500',
-            bg: proUser ? 'bg-electric/10' : 'bg-amber-500/10',
-            title: proUser ? 'Pro plan active' : 'Upgrade to Pro',
-            desc: proUser ? 'Advanced Claude Sonnet AI' : 'Unlock Claude Sonnet AI',
+            href: '/integrations',
+            icon: Link2,
+            gradient: 'from-teal-500 to-cyan-500',
+            shadow: 'shadow-teal-200',
+            title: 'Import grades',
+            desc: 'Synergy, IXL, and more',
           },
         ].map((action, i) => {
           const Icon = action.icon
@@ -137,8 +194,8 @@ export default async function DashboardPage() {
             <ScrollReveal key={action.href} direction="up" delay={i * 80}>
             <Link href={action.href}>
               <div className="glass-card p-5 h-full group glow-border">
-                <div className={`w-10 h-10 rounded-xl ${action.bg} ${action.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon className="w-5 h-5" />
+                <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 shadow-md ${action.shadow}`}>
+                  <Icon className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-1 text-sm">{action.title}</h3>
                 <p className="text-xs text-gray-500">{action.desc}</p>

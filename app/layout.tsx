@@ -71,56 +71,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.className} min-h-screen antialiased`}>
         {/* Fixed liquid background — renders on every page */}
-        <div className="fixed inset-0 -z-10 overflow-hidden bg-[#F8FBFF]">
-          {/* Primary large blob — top right */}
-          <div
-            className="liquid-blob bg-[#0066FF] w-[750px] h-[750px] opacity-[0.07]"
-            style={{
-              top: '-250px',
-              right: '-200px',
-              animation: 'liquidBlob 28s ease-in-out infinite',
-            }}
-          />
-          {/* Secondary blob — bottom left */}
-          <div
-            className="liquid-blob bg-[#3B82F6] w-[580px] h-[580px] opacity-[0.06]"
-            style={{
-              bottom: '-140px',
-              left: '-160px',
-              animation: 'liquidBlobAlt 36s ease-in-out infinite',
-              animationDelay: '-8s',
-            }}
-          />
-          {/* Accent blob — center */}
-          <div
-            className="liquid-blob bg-[#818CF8] w-[380px] h-[380px] opacity-[0.045]"
-            style={{
-              top: '30%',
-              right: '12%',
-              animation: 'liquidBlobSlow 42s ease-in-out infinite',
-              animationDelay: '-16s',
-            }}
-          />
-          {/* Small electric blob — upper left */}
-          <div
-            className="liquid-blob bg-[#0EA5E9] w-[260px] h-[260px] opacity-[0.04]"
-            style={{
-              top: '10%',
-              left: '5%',
-              animation: 'liquidBlob 22s ease-in-out infinite',
-              animationDelay: '-5s',
-            }}
-          />
-          {/* Tiny violet accent — lower right */}
-          <div
-            className="liquid-blob bg-[#6366F1] w-[180px] h-[180px] opacity-[0.035]"
-            style={{
-              bottom: '20%',
-              right: '5%',
-              animation: 'liquidBlobAlt 18s ease-in-out infinite',
-              animationDelay: '-12s',
-            }}
-          />
+        <div className="fixed inset-0 -z-10 overflow-hidden bg-[#F7FAFF]">
+          {/* Primary blue blob — top right */}
+          <div className="liquid-blob bg-[#0066FF] w-[700px] h-[700px] opacity-[0.08]"
+            style={{ top: '-220px', right: '-180px', animation: 'liquidBlob 28s ease-in-out infinite' }} />
+          {/* Violet blob — bottom left */}
+          <div className="liquid-blob bg-[#7C3AED] w-[560px] h-[560px] opacity-[0.07]"
+            style={{ bottom: '-120px', left: '-140px', animation: 'liquidBlobAlt 36s ease-in-out infinite', animationDelay: '-8s' }} />
+          {/* Pink blob — center right */}
+          <div className="liquid-blob bg-[#EC4899] w-[340px] h-[340px] opacity-[0.055]"
+            style={{ top: '28%', right: '8%', animation: 'liquidBlobSlow 40s ease-in-out infinite', animationDelay: '-14s' }} />
+          {/* Teal blob — upper left */}
+          <div className="liquid-blob bg-[#0D9488] w-[280px] h-[280px] opacity-[0.05]"
+            style={{ top: '8%', left: '4%', animation: 'liquidBlob 24s ease-in-out infinite', animationDelay: '-5s' }} />
+          {/* Orange blob — lower center */}
+          <div className="liquid-blob bg-[#F97316] w-[220px] h-[220px] opacity-[0.04]"
+            style={{ bottom: '30%', left: '35%', animation: 'liquidBlobAlt 32s ease-in-out infinite', animationDelay: '-20s' }} />
+          {/* Indigo accent — lower right */}
+          <div className="liquid-blob bg-[#6366F1] w-[200px] h-[200px] opacity-[0.05]"
+            style={{ bottom: '10%', right: '4%', animation: 'liquidBlobAlt 20s ease-in-out infinite', animationDelay: '-12s' }} />
+          {/* Sky accent — mid left */}
+          <div className="liquid-blob bg-[#0EA5E9] w-[160px] h-[160px] opacity-[0.04]"
+            style={{ top: '52%', left: '2%', animation: 'liquidBlobSlow 30s ease-in-out infinite', animationDelay: '-7s' }} />
         </div>
         {children}
       </body>
