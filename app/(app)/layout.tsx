@@ -2,13 +2,19 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getUserPlan } from '@/lib/tier'
 import Sidebar from '@/components/layout/sidebar'
+import OnboardingModal from '@/components/onboarding/OnboardingModal'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const plan = await getUserPlan()
+  const [plan, { data: profile }] = await Promise.all([
+    getUserPlan(),
+    supabase.from('profiles').select('onboarding_completed').eq('id', user.id).single(),
+  ])
+
+  const needsOnboarding = !profile?.onboarding_completed
 
   return (
     <div className="min-h-screen flex">
@@ -18,6 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           {children}
         </main>
       </div>
+      <OnboardingModal show={needsOnboarding} />
     </div>
   )
 }

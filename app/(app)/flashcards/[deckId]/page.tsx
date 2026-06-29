@@ -57,12 +57,15 @@ interface PageProps {
   params: Promise<{ deckId: string }>
 }
 
-type ViewMode = 'list' | 'quiz'
+type ViewMode = 'list' | 'quiz' | 'results'
+
+interface QuizResult { card: FlashcardCard; correct: boolean }
 
 export default function DeckPage({ params }: PageProps) {
   const { deckId } = use(params)
   const [deck, setDeck] = useState<FlashcardDeck | null>(null)
   const [cards, setCards] = useState<FlashcardCard[]>([])
+  const [quizCards, setQuizCards] = useState<FlashcardCard[]>([])
   const [loading, setLoading] = useState(true)
   const [viewMode, setViewMode] = useState<ViewMode>('list')
   const [addingCard, setAddingCard] = useState(false)
@@ -72,6 +75,7 @@ export default function DeckPage({ params }: PageProps) {
   const [genTopic, setGenTopic] = useState('')
   const [flipped, setFlipped] = useState(false)
   const [quizIndex, setQuizIndex] = useState(0)
+  const [quizResults, setQuizResults] = useState<QuizResult[]>([])
   const router = useRouter()
   const supabase = createClient()
 
@@ -129,19 +133,29 @@ export default function DeckPage({ params }: PageProps) {
     }
   }
 
+  function startQuiz(subset?: FlashcardCard[]) {
+    const deck = subset ?? cards
+    setQuizCards(deck)
+    setQuizResults([])
+    setQuizIndex(0)
+    setFlipped(false)
+    setViewMode('quiz')
+  }
+
   async function markResult(correct: boolean) {
-    const card = cards[quizIndex]
+    const card = quizCards[quizIndex]
     await supabase.from('flashcard_cards').update({
       times_seen: card.times_seen + 1,
       times_correct: correct ? card.times_correct + 1 : card.times_correct,
       last_reviewed_at: new Date().toISOString(),
     }).eq('id', card.id)
+    const newResults = [...quizResults, { card, correct }]
+    setQuizResults(newResults)
     setFlipped(false)
-    if (quizIndex + 1 < cards.length) {
+    if (quizIndex + 1 < quizCards.length) {
       setQuizIndex((i) => i + 1)
     } else {
-      setViewMode('list')
-      setQuizIndex(0)
+      setViewMode('results')
       loadDeck()
     }
   }
@@ -155,24 +169,101 @@ export default function DeckPage({ params }: PageProps) {
   }
   if (!deck) return null
 
+  /* ── Results Screen ────────────────────────────────── */
+  if (viewMode === 'results') {
+    const correct = quizResults.filter((r) => r.correct).length
+    const total = quizResults.length
+    const pct = total > 0 ? Math.round((correct / total) * 100) : 0
+    const missed = quizResults.filter((r) => !r.correct).map((r) => r.card)
+    const grade = pct >= 90 ? { label: 'Excellent! 🏆', color: 'text-emerald-600' }
+      : pct >= 70 ? { label: 'Good work! 👍', color: 'text-blue-600' }
+      : pct >= 50 ? { label: 'Keep practicing', color: 'text-amber-600' }
+      : { label: 'Need more review', color: 'text-rose-600' }
+
+    return (
+      <div className="max-w-xl mx-auto space-y-5 animate-fade-up">
+        <div className="glass-card p-8 text-center">
+          {/* Circle score */}
+          <div className="relative w-28 h-28 mx-auto mb-5">
+            <svg className="w-28 h-28 -rotate-90" viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="42" fill="none" stroke="#F3F4F6" strokeWidth="10" />
+              <circle
+                cx="50" cy="50" r="42" fill="none"
+                stroke={pct >= 70 ? '#0066FF' : pct >= 50 ? '#F59E0B' : '#EF4444'}
+                strokeWidth="10"
+                strokeLinecap="round"
+                strokeDasharray={`${2 * Math.PI * 42}`}
+                strokeDashoffset={`${2 * Math.PI * 42 * (1 - pct / 100)}`}
+                className="transition-all duration-1000"
+              />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-2xl font-extrabold text-gray-900">{pct}%</span>
+            </div>
+          </div>
+          <h2 className={`text-xl font-bold mb-1 ${grade.color}`}>{grade.label}</h2>
+          <p className="text-gray-500 text-sm">{correct} of {total} cards correct</p>
+        </div>
+
+        {/* Missed cards */}
+        {missed.length > 0 && (
+          <div className="glass-card p-5">
+            <h3 className="text-sm font-bold text-gray-700 mb-3">Cards to review ({missed.length})</h3>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {missed.map((c) => (
+                <div key={c.id} className="glass rounded-xl px-3 py-2">
+                  <p className="text-xs font-semibold text-gray-700 mb-0.5">{c.front}</p>
+                  <p className="text-xs text-gray-500">{c.back}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-3">
+          {missed.length > 0 && (
+            <button
+              onClick={() => startQuiz(missed)}
+              className="flex-1 glass text-gray-700 font-semibold py-3 rounded-2xl text-sm hover:bg-electric/5 transition-colors"
+            >
+              Retry missed ({missed.length})
+            </button>
+          )}
+          <button
+            onClick={() => startQuiz()}
+            className="flex-1 btn-electric text-white py-3 rounded-2xl font-semibold text-sm"
+          >
+            Study again
+          </button>
+        </div>
+        <button
+          onClick={() => setViewMode('list')}
+          className="w-full text-sm text-gray-400 hover:text-gray-700 transition-colors py-1"
+        >
+          ← Back to deck
+        </button>
+      </div>
+    )
+  }
+
   /* ── Quiz Mode ─────────────────────────────────────── */
-  if (viewMode === 'quiz' && cards.length > 0) {
-    const card = cards[quizIndex]
-    const progress = ((quizIndex) / cards.length) * 100
+  if (viewMode === 'quiz' && quizCards.length > 0) {
+    const card = quizCards[quizIndex]
+    const progress = (quizIndex / quizCards.length) * 100
 
     return (
       <div className="max-w-xl mx-auto space-y-6 animate-fade-up">
         {/* Quiz header */}
         <div className="flex items-center justify-between">
           <button
-            onClick={() => { setViewMode('list'); setQuizIndex(0); setFlipped(false) }}
+            onClick={() => { setViewMode('list'); setQuizIndex(0); setFlipped(false); setQuizResults([]) }}
             className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors"
           >
             <ChevronLeft className="w-4 h-4" />
             Exit quiz
           </button>
           <span className="text-sm font-semibold text-gray-500">
-            {quizIndex + 1} <span className="text-gray-300">/</span> {cards.length}
+            {quizIndex + 1} <span className="text-gray-300">/</span> {quizCards.length}
           </span>
         </div>
 
@@ -268,7 +359,7 @@ export default function DeckPage({ params }: PageProps) {
           </Button>
           {cards.length > 0 && (
             <Button
-              onClick={() => { setViewMode('quiz'); setQuizIndex(0); setFlipped(false) }}
+              onClick={() => startQuiz()}
               className="flex items-center gap-1.5"
             >
               <ChevronRight className="w-4 h-4" />

@@ -153,3 +153,17 @@ export interface ClassRow {
   teacher_id: string
   created_at: string
 }
+
+export interface GroupMessage {
+  id: string
+  group_id: string
+  user_id: string
+  content: string
+  sender_name: string
+  created_at: string
+}
+
+export interface StudyActivity {
+  user_id: string
+  activity_date: string
+}

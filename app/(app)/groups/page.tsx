@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Users, Plus, LogIn, X, Copy, Check, MessageSquare } from 'lucide-react'
+import { Users, Plus, LogIn, X, Copy, Check, MessageSquare, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
 import type { StudyGroup } from '@/types'
 
 export default function GroupsPage() {
@@ -150,27 +151,32 @@ export default function GroupsPage() {
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {groups.map((grp) => (
-            <div key={grp.id} className="glass-card p-5 h-full">
-              <div className="flex items-start justify-between mb-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${subjectColors[grp.subject ?? ''] ?? subjectColors.default}`}>
-                  <Users className="w-5 h-5" />
+            <Link key={grp.id} href={`/groups/${grp.id}`}>
+              <div className="glass-card p-5 h-full group hover:shadow-glass-hover transition-all">
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${subjectColors[grp.subject ?? ''] ?? subjectColors.default}`}>
+                    <Users className="w-5 h-5" />
+                  </div>
+                  <button
+                    onClick={(e) => { e.preventDefault(); copyCode(grp.invite_code, grp.id) }}
+                    className="flex items-center gap-1 text-xs text-gray-400 hover:text-electric transition-colors glass rounded-lg px-2 py-1"
+                  >
+                    {copiedId === grp.id ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                    {grp.invite_code}
+                  </button>
                 </div>
-                <button
-                  onClick={() => copyCode(grp.invite_code, grp.id)}
-                  className="flex items-center gap-1 text-xs text-gray-400 hover:text-electric transition-colors glass rounded-lg px-2 py-1"
-                >
-                  {copiedId === grp.id ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                  {grp.invite_code}
-                </button>
+                <h3 className="font-bold text-gray-900 text-sm mb-0.5">{grp.name}</h3>
+                {grp.subject && <p className="text-xs text-electric">{grp.subject}</p>}
+                {grp.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{grp.description}</p>}
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center gap-1 text-xs text-gray-400">
+                    <MessageSquare className="w-3 h-3" />
+                    Open chat
+                  </div>
+                  <ArrowRight className="w-3.5 h-3.5 text-gray-300 group-hover:text-electric group-hover:translate-x-0.5 transition-all" />
+                </div>
               </div>
-              <h3 className="font-bold text-gray-900 text-sm mb-0.5">{grp.name}</h3>
-              {grp.subject && <p className="text-xs text-electric">{grp.subject}</p>}
-              {grp.description && <p className="text-xs text-gray-500 mt-1 line-clamp-2">{grp.description}</p>}
-              <div className="flex items-center gap-1 mt-3 text-xs text-gray-400">
-                <MessageSquare className="w-3 h-3" />
-                Share the code to invite members
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

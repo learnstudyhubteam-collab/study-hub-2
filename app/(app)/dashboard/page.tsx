@@ -1,7 +1,9 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { getUserPlan } from '@/lib/tier'
+import { logActivity, getStreakData } from '@/lib/activity'
 import UpgradeBanner from '@/components/billing/UpgradeBanner'
+import StreakWidget from '@/components/dashboard/StreakWidget'
 import ScrollReveal from '@/components/ui/scroll-reveal'
 import { BookOpen, Layers, Zap, ArrowRight, Clock, ChevronRight } from 'lucide-react'
 import type { StudySession, FlashcardDeck } from '@/types'
@@ -17,7 +19,10 @@ export default async function DashboardPage() {
   const plan = await getUserPlan()
   const proUser = plan === 'plus' || plan === 'pro'
 
-  const [{ data: sessions }, { data: decks }, { data: profile }] = await Promise.all([
+  // Log today's activity (upsert — safe to call on every load)
+  await logActivity(supabase, user!.id)
+
+  const [{ data: sessions }, { data: decks }, { data: profile }, streakData] = await Promise.all([
     supabase
       .from('study_sessions')
       .select('*')
@@ -31,6 +36,7 @@ export default async function DashboardPage() {
       .order('updated_at', { ascending: false })
       .limit(4),
     supabase.from('profiles').select('full_name').eq('id', user!.id).single(),
+    getStreakData(supabase, user!.id),
   ])
 
   const firstName = profile?.full_name?.split(' ')[0] ?? 'there'
@@ -119,6 +125,11 @@ export default async function DashboardPage() {
           )
         })}
       </div>
+
+      {/* Streak */}
+      <ScrollReveal direction="up" delay={120}>
+        <StreakWidget streak={streakData.streak} totalDays={streakData.totalDays} last7={streakData.last7} />
+      </ScrollReveal>
 
       <div className="grid lg:grid-cols-2 gap-5">
         {/* Recent sessions */}
