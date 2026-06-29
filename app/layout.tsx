@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 
@@ -29,10 +29,6 @@ export const metadata: Metadata = {
     ],
   },
   formatDetection: { telephone: false },
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#F8FBFF' },
-    { media: '(prefers-color-scheme: dark)', color: '#0A0F1E' },
-  ],
   icons: {
     icon: [
       { url: '/icons/favicon-16.png', sizes: '16x16', type: 'image/png' },
@@ -44,6 +40,13 @@ export const metadata: Metadata = {
       { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
     ],
   },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F8FBFF' },
+    { media: '(prefers-color-scheme: dark)', color: '#0A0F1E' },
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
