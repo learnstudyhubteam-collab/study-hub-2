@@ -71,7 +71,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.className} min-h-screen antialiased`}>
         {/* Fixed liquid background — renders on every page */}
-        <div className="fixed inset-0 -z-10 overflow-hidden bg-[#F7FAFF]">
+        <div className="fixed inset-0 -z-10 overflow-hidden bg-[#F7FAFF]" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%230066FF' fill-opacity='0.055'%3E%3Crect x='15' y='8' width='2.5' height='16'/%3E%3Crect x='8' y='15' width='16' height='2.5'/%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundSize: '32px 32px',
+        }}>
           {/* Primary blue blob — top right */}
           <div className="liquid-blob bg-[#0066FF] w-[700px] h-[700px] opacity-[0.08]"
             style={{ top: '-220px', right: '-180px', animation: 'liquidBlob 28s ease-in-out infinite' }} />
