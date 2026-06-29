@@ -17,6 +17,7 @@ interface SidebarProps { plan?: SubscriptionPlan }
 const navGroups = [
   {
     label: 'General',
+    color: 'text-blue-500',
     items: [
       { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
       { href: '/classes', label: 'Classes', icon: GraduationCap },
@@ -24,6 +25,7 @@ const navGroups = [
   },
   {
     label: 'AI Tutor',
+    color: 'text-violet-500',
     items: [
       { href: '/study', label: 'AI Chat', icon: BookOpen },
       { href: '/guides', label: 'Study Guides', icon: FileText },
@@ -32,6 +34,7 @@ const navGroups = [
   },
   {
     label: 'Tracker',
+    color: 'text-emerald-500',
     items: [
       { href: '/assignments', label: 'Assignments', icon: ClipboardList },
       { href: '/grades', label: 'Grades', icon: Calculator },
@@ -41,6 +44,7 @@ const navGroups = [
   },
   {
     label: 'Collaborate',
+    color: 'text-cyan-500',
     items: [
       { href: '/groups', label: 'Study Groups', icon: Users },
       { href: '/flashcards', label: 'Flashcards', icon: Layers },
@@ -101,7 +105,7 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
       <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5 scrollbar-hide">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2 mb-1.5">
+            <p className={`text-[10px] font-bold ${group.color} uppercase tracking-widest px-2 mb-1.5`}>
               {group.label}
             </p>
             <div className="space-y-0.5">
