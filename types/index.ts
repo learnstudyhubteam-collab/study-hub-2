@@ -11,6 +11,11 @@ export interface Profile {
   stripe_subscription_id: string | null
   created_at: string
   updated_at: string
+  role: 'student' | 'teacher' | 'admin' | null
+  school: string | null
+  grade_level: string | null
+  county: string | null
+  classes: string[] | null
 }
 
 export interface StudySession {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   ArrowLeft, Users, Send, Copy, Check, MessageSquare,
-  Link2, FileText, Plus, Trash2, ExternalLink, X,
+  Link2, FileText, Plus, Trash2, ExternalLink, X, CalendarClock,
 } from 'lucide-react'
 import Link from 'next/link'
 import type { StudyGroup, GroupMessage } from '@/types'
@@ -32,6 +32,34 @@ interface GroupResource {
 
 type Tab = 'chat' | 'resources' | 'members'
 
+interface DetectedEvent {
+  messageId: string
+  senderName: string
+  originalText: string
+  hint: string
+}
+
+function detectMeetupInMessages(msgs: GroupMessage[]): DetectedEvent | null {
+  const meetupRe = /\b(meet(?:up)?|study session|get together|zoom|group study|practice|review session|hangout|gathering|video call|call)\b/i
+  const dayRe = /\b(mon(?:day)?|tue(?:sday)?|wed(?:nesday)?|thu(?:rsday)?|fri(?:day)?|sat(?:urday)?|sun(?:day)?|tomorrow|tonight|today)\b/i
+  const timeRe = /\b\d{1,2}(?::\d{2})?\s*(?:am|pm)\b/i
+  const dateRe = /\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\s+\d{1,2}\b/i
+
+  for (const msg of [...msgs].reverse().slice(0, 40)) {
+    const t = msg.content
+    if (!meetupRe.test(t)) continue
+    if (!dayRe.test(t) && !timeRe.test(t) && !dateRe.test(t)) continue
+    const parts = [t.match(dayRe)?.[0], t.match(dateRe)?.[0], t.match(timeRe)?.[0]].filter(Boolean)
+    return {
+      messageId: msg.id,
+      senderName: msg.sender_name,
+      originalText: t.length > 80 ? t.slice(0, 80) + '…' : t,
+      hint: parts.join(' ').trim(),
+    }
+  }
+  return null
+}
+
 export default function GroupPage({ params }: PageProps) {
   const { groupId } = use(params)
   const [group, setGroup] = useState<StudyGroup | null>(null)
@@ -45,6 +73,9 @@ export default function GroupPage({ params }: PageProps) {
   const [copied, setCopied] = useState(false)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [currentUserName, setCurrentUserName] = useState('')
+  const [detectedEvent, setDetectedEvent] = useState<DetectedEvent | null>(null)
+  const [dismissedEventId, setDismissedEventId] = useState<string | null>(null)
+  const [savingEvent, setSavingEvent] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const supabase = createClient()
@@ -124,6 +155,16 @@ export default function GroupPage({ params }: PageProps) {
     if (tab === 'chat') bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, tab])
 
+  useEffect(() => {
+    if (messages.length === 0) return
+    const found = detectMeetupInMessages(messages)
+    if (found && found.messageId !== dismissedEventId) {
+      setDetectedEvent(found)
+    } else {
+      setDetectedEvent(null)
+    }
+  }, [messages, dismissedEventId])
+
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault()
     const content = text.trim()
@@ -144,6 +185,24 @@ export default function GroupPage({ params }: PageProps) {
       group_id: groupId, user_id: currentUserId, content, sender_name: currentUserName,
     })
     setSending(false)
+  }
+
+  async function addEventToSchedule() {
+    if (!detectedEvent || !currentUserId || !group) return
+    setSavingEvent(true)
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) { setSavingEvent(false); return }
+    await supabase.from('study_schedules').insert({
+      user_id: user.id,
+      title: `${group.name} Study Session`,
+      content: `Study group meetup detected from chat.\n\n"${detectedEvent.originalText}"\n— ${detectedEvent.senderName}\n\nDetected: ${detectedEvent.hint}`,
+      subjects: group.subject ? [group.subject] : ['Study Session'],
+      hours_per_day: 1,
+    })
+    setSavingEvent(false)
+    setDismissedEventId(detectedEvent.messageId)
+    setDetectedEvent(null)
+    toast('Added to Study Schedule!', 'success')
   }
 
   async function addResource(e: React.FormEvent) {
@@ -352,6 +411,42 @@ export default function GroupPage({ params }: PageProps) {
             )}
             <div ref={bottomRef} />
           </div>
+
+          {/* Meetup detection banner */}
+          {detectedEvent && (
+            <div className="shrink-0 mt-2 glass rounded-2xl p-3 border border-sky-200 bg-sky-50/40 flex items-start gap-3 animate-fade-up">
+              <div className="w-8 h-8 rounded-xl bg-sky-500 flex items-center justify-center shrink-0">
+                <CalendarClock className="w-4 h-4 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-sky-800 mb-0.5">Study session detected</p>
+                <p className="text-xs text-sky-700 truncate">"{detectedEvent.originalText}"</p>
+                {detectedEvent.hint && (
+                  <p className="text-[11px] text-sky-600 mt-0.5 font-medium">{detectedEvent.hint} · {detectedEvent.senderName}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <button
+                  onClick={addEventToSchedule}
+                  disabled={savingEvent}
+                  className="flex items-center gap-1 bg-sky-500 hover:bg-sky-600 text-white text-[11px] font-semibold px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  {savingEvent ? (
+                    <div className="w-3 h-3 border border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <CalendarClock className="w-3 h-3" />
+                  )}
+                  Add to Schedule
+                </button>
+                <button
+                  onClick={() => { setDismissedEventId(detectedEvent.messageId); setDetectedEvent(null) }}
+                  className="text-sky-400 hover:text-sky-600 transition-colors p-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={sendMessage} className="shrink-0 mt-3">
             <div className="glass rounded-2xl flex items-center gap-2 p-2 pl-4">

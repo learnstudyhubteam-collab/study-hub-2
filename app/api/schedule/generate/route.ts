@@ -12,7 +12,9 @@ export async function POST(req: Request) {
   if (!user) return new Response('Unauthorized', { status: 401 })
 
   const { data: profile } = await supabase
-    .from('profiles').select('subscription_plan, subscription_status').eq('id', user.id).single()
+    .from('profiles')
+    .select('subscription_plan, subscription_status, county, grade_level, classes')
+    .eq('id', user.id).single()
 
   const status = profile?.subscription_status ?? 'free'
   const plan = (status === 'active' ? (profile?.subscription_plan ?? 'free') : 'free') as SubscriptionPlan
@@ -28,14 +30,22 @@ export async function POST(req: Request) {
     ? Math.ceil((new Date(examDate).getTime() - Date.now()) / 86400000)
     : null
 
+  const profileCtx: string[] = []
+  if (profile?.county) profileCtx.push(`School district/county: ${profile.county}`)
+  if (profile?.grade_level) profileCtx.push(`Grade level: ${profile.grade_level}`)
+  if (profile?.classes?.length) profileCtx.push(`All enrolled classes: ${(profile.classes as string[]).join(', ')}`)
+  const profileContextStr = profileCtx.length > 0
+    ? `\nStudent profile:\n${profileCtx.map((l) => `- ${l}`).join('\n')}`
+    : ''
+
   const { text } = await generateText({
     model: anthropic(modelId),
     prompt: `Create a detailed, personalized study schedule.
 
-Subjects: ${subjectsStr}
+Subjects to focus on: ${subjectsStr}
 ${examDate ? `Goal/Exam Date: ${examDate} (${daysUntilExam} days away)` : ''}
 Available study time: ${hoursPerDay} hours per day
-${extraContext ? `Extra context: ${extraContext}` : ''}
+${extraContext ? `Extra context: ${extraContext}` : ''}${profileContextStr}
 
 Create a day-by-day study plan that:
 1. Distributes subjects evenly based on difficulty and available time
@@ -43,6 +53,7 @@ Create a day-by-day study plan that:
 3. Allocates more time to weaker areas if mentioned
 4. Includes short breaks (Pomodoro-style)
 5. Has a review period before the exam/goal date
+${profile?.county ? `6. Accounts for typical school calendar patterns and standardized tests in ${profile.county}` : ''}
 
 Format it clearly with days as headers, specific time blocks, and brief topic descriptions.
 Be practical and motivating. Include study tips specific to the subjects listed.`,
