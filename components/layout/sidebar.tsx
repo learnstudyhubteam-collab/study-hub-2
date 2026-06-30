@@ -8,6 +8,7 @@ import {
   GraduationCap, ClipboardList, Calculator, Clock, CalendarClock,
   Users, FileText, Menu, X, Sparkles, Settings, Command, Link2, Sigma,
   Shield, Monitor, Megaphone, BarChart3, AlertTriangle,
+  Trophy, Gem, MessageSquareHeart,
 } from 'lucide-react'
 import { useState } from 'react'
 import PomodoroTimer from '@/components/layout/PomodoroTimer'
@@ -52,6 +53,15 @@ const studentNavGroups = [
     ],
   },
   {
+    label: 'Learn',
+    color: 'text-pink-500',
+    items: [
+      { href: '/learn', label: 'Learn Mode', icon: Trophy },
+      { href: '/shop', label: 'Ruby Shop', icon: Gem },
+      { href: '/feedback', label: 'Feedback', icon: MessageSquareHeart },
+    ],
+  },
+  {
     label: 'Tools',
     color: 'text-orange-500',
     items: [
@@ -88,6 +98,15 @@ const teacherNavGroups = [
     ],
   },
   {
+    label: 'Learn',
+    color: 'text-pink-500',
+    items: [
+      { href: '/learn', label: 'Learn Mode', icon: Trophy },
+      { href: '/shop', label: 'Ruby Shop', icon: Gem },
+      { href: '/feedback', label: 'Feedback', icon: MessageSquareHeart },
+    ],
+  },
+  {
     label: 'Tools',
     color: 'text-orange-500',
     items: [
@@ -114,6 +133,15 @@ const adminNavGroups = [
       { href: '/admin/announcements/new', label: 'Announcements', icon: Megaphone },
       { href: '/classes', label: 'All Classes', icon: GraduationCap },
       { href: '/assignments', label: 'Assignments', icon: ClipboardList },
+    ],
+  },
+  {
+    label: 'Learn',
+    color: 'text-pink-500',
+    items: [
+      { href: '/learn', label: 'Learn Mode', icon: Trophy },
+      { href: '/shop', label: 'Ruby Shop', icon: Gem },
+      { href: '/admin/feedback', label: 'View Feedback', icon: MessageSquareHeart },
     ],
   },
   {

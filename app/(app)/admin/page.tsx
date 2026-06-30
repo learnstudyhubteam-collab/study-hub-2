@@ -4,7 +4,7 @@ import Link from 'next/link'
 import {
   Users, Shield, School, Megaphone, BarChart3, TrendingUp,
   BookOpen, GraduationCap, AlertTriangle, CheckCircle, Clock,
-  ChevronRight, Plus, Settings, Monitor,
+  ChevronRight, Plus, Settings, Monitor, MessageSquareHeart,
 } from 'lucide-react'
 import ScrollReveal from '@/components/ui/scroll-reveal'
 
@@ -227,12 +227,13 @@ export default async function AdminDashboardPage() {
             <BarChart3 className="w-4 h-4 text-electric" />
             Admin Actions
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[
               { label: 'User Management', desc: 'View, edit, or remove users', icon: Users, href: '/admin/users', color: 'text-blue-500 bg-blue-50' },
               { label: 'Screen Monitor', desc: 'Watch student activity live', icon: Monitor, href: '/monitor', color: 'text-violet-500 bg-violet-50' },
               { label: 'Overdue Items', desc: `${overdueCount ?? 0} overdue platform-wide`, icon: AlertTriangle, href: '/overdue', color: 'text-red-500 bg-red-50' },
               { label: 'Announcements', desc: 'Broadcast to all users', icon: Megaphone, href: '/admin/announcements/new', color: 'text-orange-500 bg-orange-50' },
+              { label: 'User Feedback', desc: 'Read what users are saying', icon: MessageSquareHeart, href: '/admin/feedback', color: 'text-pink-500 bg-pink-50' },
             ].map((action) => {
               const Icon = action.icon
               const [iconColor, iconBg] = action.color.split(' ')
