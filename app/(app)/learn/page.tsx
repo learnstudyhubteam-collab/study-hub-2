@@ -2,10 +2,17 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { subjects } from '@/lib/learn-content'
-import { Flame, Gem, Shield, BookOpen, Star } from 'lucide-react'
+import { Flame, Gem, BookOpen, Star, Target } from 'lucide-react'
 import ScrollReveal from '@/components/ui/scroll-reveal'
 
 export const dynamic = 'force-dynamic'
+
+const levelLabel: Record<number, string> = { 1: 'Foundations', 2: 'Intermediate', 3: 'Advanced' }
+const levelColor: Record<number, string> = {
+  1: 'text-blue-600',
+  2: 'text-violet-600',
+  3: 'text-emerald-600',
+}
 
 export default async function LearnPage() {
   const supabase = await createClient()
@@ -14,23 +21,19 @@ export default async function LearnPage() {
 
   const [{ data: profile }, { data: progressRows }, { data: streakData }] = await Promise.all([
     supabase.from('profiles').select('full_name, rubies, streak_freeze_count').eq('id', user.id).single(),
-    supabase.from('learn_progress').select('subject, xp, lessons_completed').eq('user_id', user.id),
+    supabase.from('learn_progress').select('subject, xp, lessons_completed, level, placement_done').eq('user_id', user.id),
     supabase.from('study_activities').select('activity_date').eq('user_id', user.id).order('activity_date', { ascending: false }).limit(30),
   ])
 
   const progressMap = Object.fromEntries((progressRows ?? []).map((p) => [p.subject, p]))
 
-  // Compute streak
   let streak = 0
   if (streakData && streakData.length > 0) {
-    const today = new Date().toISOString().split('T')[0]
-    let check = new Date()
+    const check = new Date()
     for (const row of streakData) {
       const d = check.toISOString().split('T')[0]
-      if (row.activity_date === d) {
-        streak++
-        check.setDate(check.getDate() - 1)
-      } else break
+      if (row.activity_date === d) { streak++; check.setDate(check.getDate() - 1) }
+      else break
     }
   }
 
@@ -56,7 +59,6 @@ export default async function LearnPage() {
         </div>
       </ScrollReveal>
 
-      {/* Stats */}
       <ScrollReveal delay={0.05}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
@@ -79,19 +81,6 @@ export default async function LearnPage() {
         </div>
       </ScrollReveal>
 
-      {/* Streak freeze reminder */}
-      {(profile?.streak_freeze_count ?? 0) > 0 && (
-        <ScrollReveal delay={0.08}>
-          <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 border border-blue-200">
-            <Shield className="w-5 h-5 text-blue-500 shrink-0" />
-            <p className="text-sm text-blue-700">
-              You have <strong>{profile?.streak_freeze_count}</strong> streak freeze{(profile?.streak_freeze_count ?? 0) !== 1 ? 's' : ''} — your streak is protected if you miss a day.
-            </p>
-          </div>
-        </ScrollReveal>
-      )}
-
-      {/* Subject grid */}
       <ScrollReveal delay={0.1}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {subjects.map((subject) => {
@@ -100,33 +89,49 @@ export default async function LearnPage() {
             const done = prog?.lessons_completed ?? 0
             const total = subject.lessons.length
             const pct = total > 0 ? Math.round((done / total) * 100) : 0
+            const placementDone = prog?.placement_done ?? false
+            const userLevel = prog?.level ?? 1
+            const needsPlacement = subject.hasPlacement && !placementDone
+
             return (
               <Link
                 key={subject.id}
-                href={`/learn/${subject.id}`}
+                href={needsPlacement ? `/learn/${subject.id}/placement` : `/learn/${subject.id}`}
                 className={`glass rounded-2xl p-5 border ${subject.border} hover:shadow-md hover:-translate-y-0.5 transition-all group space-y-4`}
               >
                 <div className="flex items-start justify-between">
                   <div className={`w-12 h-12 rounded-2xl ${subject.bg} flex items-center justify-center text-2xl`}>
                     {subject.emoji}
                   </div>
-                  {done === total && total > 0 && (
+                  {needsPlacement ? (
+                    <span className="flex items-center gap-1 text-[10px] font-bold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
+                      <Target className="w-3 h-3" /> Place me
+                    </span>
+                  ) : done === total && total > 0 ? (
                     <span className="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
-                  )}
+                  ) : placementDone ? (
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 ${levelColor[userLevel]}`}>
+                      {levelLabel[userLevel]}
+                    </span>
+                  ) : null}
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 text-base">{subject.label}</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">{done}/{total} lessons · {xp} XP</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {needsPlacement ? 'Take placement test to start' : `${done}/${total} lessons · ${xp} XP`}
+                  </p>
                 </div>
-                <div className="space-y-1.5">
-                  <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-emerald-500' : 'bg-electric'}`}
-                      style={{ width: `${pct}%` }}
-                    />
+                {!needsPlacement && (
+                  <div className="space-y-1.5">
+                    <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all ${pct === 100 ? 'bg-emerald-500' : 'bg-electric'}`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <p className="text-[10px] text-gray-400">{pct}% complete</p>
                   </div>
-                  <p className="text-[10px] text-gray-400">{pct}% complete</p>
-                </div>
+                )}
               </Link>
             )
           })}
