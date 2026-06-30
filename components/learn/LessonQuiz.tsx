@@ -60,12 +60,10 @@ export default function LessonQuiz({ subject, lesson, userId, alreadyCompleted }
             xp_earned: xpEarned,
             rubies_earned: rubiesEarned,
           }),
-          supabase.rpc
-            ? null
-            : supabase.from('learn_progress').upsert(
-                { user_id: userId, subject: subject.id, xp: xpEarned, lessons_completed: 1 },
-                { onConflict: 'user_id,subject' }
-              ),
+          supabase.from('learn_progress').upsert(
+              { user_id: userId, subject: subject.id, xp: xpEarned, lessons_completed: 1 },
+              { onConflict: 'user_id,subject' }
+            ),
           xpEarned > 0 || rubiesEarned > 0
             ? supabase.from('profiles').select('rubies').eq('id', userId).single().then(({ data }) => {
                 const current = data?.rubies ?? 0
