@@ -30,9 +30,9 @@ export type Subject = {
 
 export const subjects: Subject[] = [
   {
-    id: 'math',
-    label: 'Math',
-    emoji: '➗',
+    id: 'algebra1',
+    label: 'Algebra 1',
+    emoji: '🔢',
     color: 'text-blue-600',
     bg: 'bg-blue-50',
     border: 'border-blue-200',
