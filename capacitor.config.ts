@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.studyhub.app',
-  appName: 'Study Hub',
+  appName: 'Tutor AI',
   // For production: point to your Vercel deployment URL
   // For local dev with `next dev`: use your local IP, e.g. http://192.168.1.x:3000
   server: {

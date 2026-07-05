@@ -7,12 +7,13 @@ import {
   Zap, LayoutDashboard, BookOpen, Layers, CreditCard, LogOut,
   GraduationCap, ClipboardList, Calculator, Clock, CalendarClock,
   Users, FileText, Menu, X, Sparkles, Settings, Command, Link2, Sigma,
+  Building2, Shield,
 } from 'lucide-react'
 import { useState } from 'react'
 import PomodoroTimer from '@/components/layout/PomodoroTimer'
 
 import type { SubscriptionPlan } from '@/lib/tier'
-interface SidebarProps { plan?: SubscriptionPlan }
+interface SidebarProps { plan?: SubscriptionPlan; role?: string | null }
 
 const navGroups = [
   {
@@ -71,8 +72,10 @@ function openCommandPalette() {
   window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))
 }
 
-export default function Sidebar({ plan = 'free' }: SidebarProps) {
+export default function Sidebar({ plan = 'free', role }: SidebarProps) {
   const isPaid = plan === 'plus' || plan === 'pro'
+  const isTeacher = role === 'teacher' || role === 'admin'
+  const isAdmin = role === 'admin'
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -92,7 +95,7 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
           <div className="w-8 h-8 rounded-xl bg-electric-gradient flex items-center justify-center shadow-electric group-hover:shadow-electric-lg transition-all">
             <Zap className="w-4 h-4 text-white" fill="white" />
           </div>
-          <span className="text-base font-bold text-gradient">Study Hub</span>
+          <span className="text-base font-bold text-gradient">Tutor AI</span>
         </Link>
       </div>
 
@@ -138,6 +141,70 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
             </div>
           </div>
         ))}
+
+        {/* Educator section — teachers and admins */}
+        {isTeacher && (
+          <div>
+            <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest px-2 mb-1.5">
+              Educator
+            </p>
+            <div className="space-y-0.5">
+              {[
+                { href: '/teacher', label: 'Teacher Hub', icon: GraduationCap },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/')
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      active
+                        ? 'bg-indigo-500/10 text-indigo-600 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.15)]'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-black/5'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-indigo-500' : ''}`} />
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* District Admin section */}
+        {isAdmin && (
+          <div>
+            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest px-2 mb-1.5">
+              District Admin
+            </p>
+            <div className="space-y-0.5">
+              {[
+                { href: '/admin', label: 'Admin Dashboard', icon: Building2 },
+              ].map((item) => {
+                const active = pathname === item.href || pathname.startsWith(item.href + '/')
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      active
+                        ? 'bg-blue-500/10 text-blue-600 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.15)]'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-black/5'
+                    }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-blue-500' : ''}`} />
+                    {item.label}
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </nav>
 
       {/* Pomodoro Timer */}
@@ -204,7 +271,7 @@ export default function Sidebar({ plan = 'free' }: SidebarProps) {
           <div className="w-7 h-7 rounded-lg bg-electric-gradient flex items-center justify-center shadow-electric">
             <Zap className="w-3.5 h-3.5 text-white" fill="white" />
           </div>
-          <span className="text-sm font-bold text-gradient">Study Hub</span>
+          <span className="text-sm font-bold text-gradient">Tutor AI</span>
         </Link>
         <div className="flex items-center gap-2">
           <button

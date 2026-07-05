@@ -146,7 +146,7 @@ export default function LandingPage() {
             <div className="w-8 h-8 rounded-xl bg-electric-gradient flex items-center justify-center shadow-electric group-hover:shadow-electric-lg transition-all duration-300 group-hover:scale-110">
               <Zap className="w-4 h-4 text-white" fill="white" />
             </div>
-            <span className="text-lg font-bold text-gradient">Study Hub</span>
+            <span className="text-lg font-bold text-gradient">Tutor AI</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors px-3 py-2 rounded-xl hover:bg-black/5">
@@ -500,10 +500,10 @@ export default function LandingPage() {
               <div className="w-6 h-6 rounded-lg bg-electric-gradient flex items-center justify-center shadow-electric">
                 <Zap className="w-3.5 h-3.5 text-white" fill="white" />
               </div>
-              <span className="text-sm font-bold text-gradient">Study Hub</span>
+              <span className="text-sm font-bold text-gradient">Tutor AI</span>
             </Link>
             <p className="text-sm text-gray-400">
-              © {new Date().getFullYear()} Study Hub. Built to help people learn.
+              © {new Date().getFullYear()} Tutor AI. Built to help people learn.
             </p>
           </div>
         </footer>

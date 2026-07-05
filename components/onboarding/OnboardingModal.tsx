@@ -7,7 +7,7 @@ import { Zap, BookOpen, Layers, Brain, Users, GraduationCap, ClipboardList, Cale
 const STEPS = [
   {
     id: 'welcome',
-    title: 'Welcome to Study Hub 🎉',
+    title: 'Welcome to Tutor AI 🎉',
     subtitle: "You're all set. Let's show you around in 30 seconds.",
   },
   {
@@ -102,7 +102,7 @@ export default function OnboardingModal({ show }: Props) {
                   <Zap className="w-10 h-10 text-white" fill="white" />
                 </div>
                 <p className="text-center text-gray-600 text-sm leading-relaxed max-w-xs">
-                  Study Hub combines an <strong className="text-gray-900">AI tutor</strong>, <strong className="text-gray-900">flashcards</strong>, <strong className="text-gray-900">assignment tracking</strong>, and <strong className="text-gray-900">classroom tools</strong> — all in one place.
+                  Tutor AI combines an <strong className="text-gray-900">AI tutor</strong>, <strong className="text-gray-900">flashcards</strong>, <strong className="text-gray-900">assignment tracking</strong>, and <strong className="text-gray-900">classroom tools</strong> — all in one place.
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-3">

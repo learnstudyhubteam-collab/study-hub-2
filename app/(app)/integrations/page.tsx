@@ -6,10 +6,10 @@ import { createClient } from '@/lib/supabase/client'
 import { toast } from '@/lib/toast'
 import {
   Link2, X, Upload, Check, ChevronRight, RefreshCw,
-  Sparkles, Info, GraduationCap, BarChart2, Zap, BookOpen, School, Globe2,
+  Sparkles, Info, GraduationCap, BarChart2, Zap, BookOpen, School, Globe2, Shield,
 } from 'lucide-react'
 
-type ConnectorId = 'synergy' | 'ixl' | 'performance_matters' | 'canvas' | 'powerschool' | 'google_classroom'
+type ConnectorId = 'synergy' | 'ixl' | 'performance_matters' | 'canvas' | 'powerschool' | 'google_classroom' | 'lightspeed'
 type ModalStep = 'instructions' | 'paste' | 'preview'
 
 interface ParsedEntry {
@@ -191,6 +191,32 @@ Quadratics HW,Algebra II,20,20`,
       'Paste it on the next step.',
     ],
   },
+  {
+    id: 'lightspeed' as ConnectorId,
+    name: 'Lightspeed Relay',
+    shortName: 'Lightspeed',
+    description: 'Import student activity scores and course data from Lightspeed Relay\'s student reporting dashboard.',
+    gradient: 'from-sky-500 to-cyan-600',
+    glow: 'shadow-sky-200',
+    chipBg: 'bg-sky-50',
+    chipText: 'text-sky-700',
+    chipBorder: 'border-sky-200',
+    category: 'Activity + Scores',
+    Icon: Shield,
+    subjectNeeded: false,
+    isNew: true,
+    csvTemplate: `Course,Activity,Score,Total
+Algebra II,Khan Academy - Quadratics,85,100
+AP Biology,Quizlet Study Set,72,100
+US History,Reading Assessment,91,100`,
+    instructions: [
+      'Log into Lightspeed Relay as a student or ask your teacher/admin for your report.',
+      'Go to Student Activity or Course Reports.',
+      'Export the report as CSV (or copy the activity rows).',
+      'Keep columns: Course, Activity, Score, Total.',
+      'Paste the CSV on the next step.',
+    ],
+  },
 ]
 
 function parseSynergy(text: string, subject: string): ParsedEntry[] {
@@ -288,6 +314,22 @@ function parseGoogleClassroom(text: string): ParsedEntry[] {
   return results
 }
 
+function parseLightspeed(text: string): ParsedEntry[] {
+  const lines = text.trim().split('\n').filter((l) => l.trim())
+  const startIdx = lines[0]?.toLowerCase().includes('course') ? 1 : 0
+  const results: ParsedEntry[] = []
+  for (let i = startIdx; i < lines.length; i++) {
+    const cols = lines[i].split(',').map((s) => s.trim().replace(/^"|"$/g, ''))
+    if (cols.length < 4) continue
+    const [course, activity, scoreStr, totalStr] = cols
+    const score = parseFloat(scoreStr)
+    const max = parseFloat(totalStr)
+    if (!activity || isNaN(score) || isNaN(max) || max === 0) continue
+    results.push({ assignment_name: activity, subject: course || 'Lightspeed', score, max_score: max })
+  }
+  return results
+}
+
 function letterFor(pct: number) {
   if (pct >= 90) return { letter: 'A', color: 'text-emerald-600', bg: 'bg-emerald-100' }
   if (pct >= 80) return { letter: 'B', color: 'text-blue-600', bg: 'bg-blue-100' }
@@ -334,6 +376,7 @@ export default function IntegrationsPage() {
     else if (connector.id === 'canvas') entries = parseCanvas(csvText)
     else if (connector.id === 'powerschool') entries = parsePowerSchool(csvText)
     else if (connector.id === 'google_classroom') entries = parseGoogleClassroom(csvText)
+    else if (connector.id === 'lightspeed') entries = parseLightspeed(csvText)
     if (entries.length === 0) {
       toast('No valid entries found — double-check the format.', 'error')
       return

@@ -40,7 +40,7 @@ export default function LoginPage() {
             <div className="w-12 h-12 rounded-2xl bg-electric-gradient flex items-center justify-center shadow-electric-lg group-hover:shadow-electric-xl transition-all duration-300 group-hover:-translate-y-0.5">
               <Zap className="w-6 h-6 text-white" fill="white" />
             </div>
-            <span className="text-2xl font-extrabold text-gradient">Study Hub</span>
+            <span className="text-2xl font-extrabold text-gradient">Tutor AI</span>
           </Link>
           <p className="text-gray-400 mt-2 text-sm">Welcome back</p>
         </div>
