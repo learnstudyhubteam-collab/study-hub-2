@@ -6,6 +6,7 @@ export type SubscriptionPlan = 'free' | 'plus' | 'pro'
 
 export interface PlanLimits {
   aiSessionsPerMonth: number | null  // null = unlimited
+  aiMessagesPerDay: number | null    // null = unlimited
   flashcardDecks: number | null
   aiScheduleGen: boolean
   aiGuideGen: boolean
@@ -15,6 +16,7 @@ export interface PlanLimits {
 export const PLAN_LIMITS: Record<SubscriptionPlan, PlanLimits> = {
   free: {
     aiSessionsPerMonth: 5,
+    aiMessagesPerDay: 25,
     flashcardDecks: 2,
     aiScheduleGen: false,
     aiGuideGen: false,
@@ -22,6 +24,7 @@ export const PLAN_LIMITS: Record<SubscriptionPlan, PlanLimits> = {
   },
   plus: {
     aiSessionsPerMonth: null,
+    aiMessagesPerDay: 300,
     flashcardDecks: null,
     aiScheduleGen: true,
     aiGuideGen: true,
@@ -29,6 +32,7 @@ export const PLAN_LIMITS: Record<SubscriptionPlan, PlanLimits> = {
   },
   pro: {
     aiSessionsPerMonth: null,
+    aiMessagesPerDay: null,
     flashcardDecks: null,
     aiScheduleGen: true,
     aiGuideGen: true,

@@ -339,6 +339,42 @@
     background-clip: text;
   }
 
+  .text-gradient-animated {
+    background: linear-gradient(120deg, #0066FF 0%, #7C3AED 30%, #DB2777 50%, #7C3AED 70%, #0066FF 100%);
+    background-size: 220% 220%;
+    animation: gradientShift 7s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ─── Hero Decorative Blobs ───────────────────────────── */
+  .hero-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(70px);
+    pointer-events: none;
+    z-index: -1;
+    animation: liquidBlob 16s ease-in-out infinite;
+  }
+  .hero-blob-1 {
+    width: 480px; height: 480px;
+    background: radial-gradient(circle, rgba(0,102,255,0.16), transparent 70%);
+    top: -120px; left: -140px;
+  }
+  .hero-blob-2 {
+    width: 420px; height: 420px;
+    background: radial-gradient(circle, rgba(124,58,237,0.14), transparent 70%);
+    top: 60px; right: -160px;
+    animation-delay: -5s;
+  }
+  .hero-blob-3 {
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(219,39,119,0.10), transparent 70%);
+    bottom: -100px; left: 30%;
+    animation-delay: -10s;
+  }
+
   /* ─── Glow Effects ────────────────────────────────────── */
   .glow-electric {
     box-shadow:

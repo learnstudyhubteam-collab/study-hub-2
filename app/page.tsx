@@ -1,9 +1,11 @@
 import Link from 'next/link'
 import {
-  Zap, BookOpen, Layers, Brain, PenLine, ArrowRight, Check, Sparkles, Star,
+  Zap, BookOpen, Layers, Brain, ArrowRight, Check, Star,
   Users, GraduationCap, ClipboardList, CalendarClock, FileText, Flame, X,
+  MapPin, DollarSign, Clock, Building2, Mail, Shield,
 } from 'lucide-react'
 import ScrollReveal from '@/components/ui/scroll-reveal'
+import DemoTutor from '@/components/landing/DemoTutor'
 
 const aiFeatures = [
   {
@@ -14,18 +16,18 @@ const aiFeatures = [
     description: 'Four study modes: direct answers, Socratic hints, step-by-step walkthroughs, and writing feedback.',
   },
   {
+    icon: MapPin,
+    color: 'text-rose-500',
+    bg: 'bg-rose-500/10',
+    title: 'Curriculum-Aligned Guides',
+    description: 'Study guides matched to YOUR state\'s standards — Virginia SOL, Texas TEKS, Florida BEST, Common Core, and more.',
+  },
+  {
     icon: Layers,
     color: 'text-blue-500',
     bg: 'bg-blue-500/10',
     title: 'Flashcards + Quiz Mode',
     description: 'Create decks manually or generate them with AI. Quiz mode tracks what you know and what needs work.',
-  },
-  {
-    icon: FileText,
-    color: 'text-rose-500',
-    bg: 'bg-rose-500/10',
-    title: 'AI Study Guides',
-    description: 'Generate comprehensive reference guides on any topic, instantly. Great for exam prep.',
   },
   {
     icon: CalendarClock,
@@ -62,8 +64,8 @@ const platformFeatures = [
     icon: BookOpen,
     color: 'text-orange-500',
     bg: 'bg-orange-500/10',
-    title: 'Grade Calculator',
-    description: 'Log scores and weights across categories. Instant GPA and weighted average. Know exactly where you stand.',
+    title: 'Grade Import & Calculator',
+    description: 'Import grades from Canvas, PowerSchool, Google Classroom, and more. Instant weighted averages.',
   },
 ]
 
@@ -72,17 +74,17 @@ const pricing = [
     name: 'Free',
     price: '$0',
     period: 'forever',
+    annualNote: null,
     description: 'Everything you need to get started.',
     model: 'Claude Haiku',
     modelNote: 'Fast, capable AI',
     features: [
       '5 AI tutor sessions / month',
+      '25 AI messages / day',
       'Up to 2 flashcard decks',
       'Classes, groups & assignments',
       'Grade calculator & exam tracker',
-      'Study streak tracking',
     ],
-    limits: [] as string[],
     cta: 'Get started free',
     href: '/signup',
     highlight: false,
@@ -92,17 +94,17 @@ const pricing = [
     name: 'Plus',
     price: '$8',
     period: 'per month',
+    annualNote: 'or $59/year (save 38%)',
     description: 'Unlimited AI for focused learners.',
     model: 'Claude Haiku',
-    modelNote: 'Fast, capable AI — unlimited',
+    modelNote: 'Unlimited sessions',
     features: [
       'Unlimited AI tutor sessions',
+      '300 AI messages / day',
       'Unlimited flashcard decks',
-      'AI study schedule generator',
-      'AI study guide creator',
+      'AI study schedules & guides',
       'AI flashcard generation',
     ],
-    limits: [] as string[],
     cta: 'Start Plus',
     href: '/signup',
     highlight: false,
@@ -112,17 +114,17 @@ const pricing = [
     name: 'Pro',
     price: '$15',
     period: 'per month',
+    annualNote: 'or $119/year (save 34%)',
     description: 'Our most powerful AI for serious students.',
     model: 'Claude Sonnet',
     modelNote: 'Most capable AI model',
     features: [
       'Everything in Plus',
+      'Unlimited daily messages',
       'Advanced Claude Sonnet AI',
       'Deeper reasoning & explanations',
-      'Superior at complex topics',
       'Priority support',
     ],
-    limits: [] as string[],
     cta: 'Start Pro',
     href: '/signup',
     highlight: true,
@@ -130,15 +132,9 @@ const pricing = [
   },
 ]
 
-const stats = [
-  { value: '8', label: 'Platform features' },
-  { value: '4', label: 'Study modes' },
-  { value: 'AI', label: 'Powered' },
-]
-
 export default function LandingPage() {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-clip">
       {/* ── Nav ──────────────────────────────────────── */}
       <nav className="glass-strong sticky top-0 z-50 border-b border-white/60">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
@@ -161,7 +157,11 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ─────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-24">
+      <section className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-24">
+        <div className="hero-blob hero-blob-1" />
+        <div className="hero-blob hero-blob-2" />
+        <div className="hero-blob hero-blob-3" />
+
         <div className="text-center max-w-3xl mx-auto">
           <div className="animate-fade-up inline-flex items-center gap-2 glass-blue text-electric text-xs font-bold px-4 py-2 rounded-full mb-8">
             <Zap className="w-3.5 h-3.5" fill="currentColor" />
@@ -170,12 +170,13 @@ export default function LandingPage() {
           </div>
 
           <h1 className="animate-fade-up delay-100 text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-[1.08] tracking-tight text-gray-900 mb-6">
-            The complete{' '}
-            <span className="text-gradient">AI study platform</span>
+            Your personal tutor.{' '}
+            <span className="text-gradient-animated">Always on.</span>
           </h1>
 
           <p className="animate-fade-up delay-200 text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            AI tutor, flashcards, assignment tracking, grade calculator, study groups, classes, and more — everything you need to learn smarter, all in one place.
+            Unlimited AI tutoring, flashcards, curriculum-aligned study guides, and everything
+            else students need — for less than the cost of a single hour with a private tutor.
           </p>
 
           <div className="animate-fade-up delay-300 flex flex-col sm:flex-row gap-3 justify-center mb-6">
@@ -183,9 +184,9 @@ export default function LandingPage() {
               Start studying for free
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="/login" className="btn-glass px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2">
-              Sign in
-            </Link>
+            <a href="#demo" className="btn-glass px-8 py-4 rounded-2xl font-semibold text-base flex items-center justify-center gap-2">
+              Try the tutor first ↓
+            </a>
           </div>
 
           <div className="animate-fade-up delay-400 flex flex-wrap items-center justify-center gap-4 mb-16 text-xs text-gray-400">
@@ -197,9 +198,9 @@ export default function LandingPage() {
             ))}
           </div>
 
-          {/* Mock Chat UI */}
-          <div className="animate-fade-up delay-400 relative mx-auto max-w-lg">
-            <div className="absolute -top-4 -left-8 sm:-left-16 float-badge rounded-2xl px-3.5 py-2.5 animate-float flex items-center gap-2 z-10 hidden sm:flex">
+          {/* Live demo tutor */}
+          <div id="demo" className="animate-fade-up delay-400 relative mx-auto max-w-lg scroll-mt-24">
+            <div className="absolute -top-4 -left-8 sm:-left-16 float-badge rounded-2xl px-3.5 py-2.5 animate-float items-center gap-2 z-10 hidden sm:flex">
               <div className="w-7 h-7 rounded-lg bg-orange-500/15 flex items-center justify-center">
                 <Flame className="w-3.5 h-3.5 text-orange-500" />
               </div>
@@ -208,7 +209,7 @@ export default function LandingPage() {
                 <p className="text-[10px] text-gray-400">keep it going!</p>
               </div>
             </div>
-            <div className="absolute -bottom-4 -right-8 sm:-right-14 float-badge rounded-2xl px-3.5 py-2.5 animate-float flex items-center gap-2 z-10 hidden sm:flex" style={{ animationDelay: '-3s' }}>
+            <div className="absolute -bottom-4 -right-8 sm:-right-14 float-badge rounded-2xl px-3.5 py-2.5 animate-float items-center gap-2 z-10 hidden sm:flex" style={{ animationDelay: '-3s' }}>
               <div className="w-7 h-7 rounded-lg bg-emerald-500/15 flex items-center justify-center">
                 <Star className="w-3.5 h-3.5 text-emerald-500" />
               </div>
@@ -218,69 +219,95 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="glass rounded-3xl p-1 shadow-[0_24px_60px_rgba(0,102,255,0.14)]">
-              <div className="rounded-2xl overflow-hidden bg-white/40">
-                <div className="glass-strong border-b border-white/60 px-4 py-3 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-lg bg-electric-gradient flex items-center justify-center">
-                      <Zap className="w-3 h-3 text-white" fill="white" />
-                    </div>
-                    <span className="text-sm font-semibold text-gray-800">Quantum Entanglement</span>
-                  </div>
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-full glass-blue text-electric">Pro model</span>
-                </div>
-                <div className="p-4 space-y-3">
-                  <div className="flex gap-2">
-                    <div className="w-7 h-7 rounded-full bg-electric/10 flex items-center justify-center shrink-0">
-                      <Zap className="w-3 h-3 text-electric" />
-                    </div>
-                    <div className="glass text-xs text-gray-700 rounded-2xl rounded-tl-sm px-3 py-2 max-w-[80%] leading-relaxed">
-                      Great topic! When two particles become entangled, their states are correlated no matter how far apart they are. What aspect would you like to explore first?
-                    </div>
-                  </div>
-                  <div className="flex gap-2 flex-row-reverse">
-                    <div className="w-7 h-7 rounded-full bg-electric flex items-center justify-center shrink-0">
-                      <span className="text-white text-xs font-bold">U</span>
-                    </div>
-                    <div className="btn-electric text-xs text-white rounded-2xl rounded-tr-sm px-3 py-2 max-w-[80%] leading-relaxed">
-                      How does measuring one particle instantly affect the other?
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="w-7 h-7 rounded-full bg-electric/10 flex items-center justify-center shrink-0">
-                      <Zap className="w-3 h-3 text-electric" />
-                    </div>
-                    <div className="glass text-xs text-gray-700 rounded-2xl rounded-tl-sm px-3 py-2 leading-relaxed">
-                      <span className="flex gap-1 items-center">
-                        <span className="w-2 h-2 bg-electric/60 rounded-full typing-dot" />
-                        <span className="w-2 h-2 bg-electric/60 rounded-full typing-dot" />
-                        <span className="w-2 h-2 bg-electric/60 rounded-full typing-dot" />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <DemoTutor />
             <div className="absolute inset-0 -z-10 rounded-3xl bg-electric/12 blur-3xl" />
           </div>
         </div>
       </section>
 
-      {/* ── Stats strip ──────────────────────────────── */}
-      <ScrollReveal direction="up" delay={0}>
-        <section className="py-8 px-4 sm:px-6">
-          <div className="max-w-2xl mx-auto">
-            <div className="glass rounded-2xl px-6 py-4 grid grid-cols-3 divide-x divide-white/40">
-              {stats.map((s) => (
-                <div key={s.label} className="text-center px-4">
-                  <p className="text-2xl sm:text-3xl font-extrabold text-gradient">{s.value}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
-                </div>
-              ))}
+      {/* ── Parents / value comparison ───────────────── */}
+      <section className="py-20 px-4 sm:px-6">
+        <div className="max-w-5xl mx-auto">
+          <ScrollReveal direction="up">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-600 text-xs font-bold px-3 py-1.5 rounded-full mb-4">
+                <DollarSign className="w-3.5 h-3.5" /> For Parents
+              </div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+                Private tutoring costs $60/hour.
+                <br className="hidden sm:block" />
+                <span className="text-gradient">This is $8/month.</span>
+              </h2>
+              <p className="text-gray-500 max-w-xl mx-auto text-lg">
+                Help with homework at 10pm. Exam prep on Sunday morning. Your student gets a
+                patient tutor whenever they need one — not just Tuesdays at 4.
+              </p>
             </div>
+          </ScrollReveal>
+
+          <div className="grid sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
+            {[
+              {
+                icon: Clock,
+                title: 'Private tutor',
+                price: '$240–480/mo',
+                sub: '1–2 hours per week',
+                points: ['Fixed weekly schedule', 'One subject at a time', 'Unavailable at 10pm before the test'],
+                dim: true,
+              },
+              {
+                icon: Brain,
+                title: 'Generic AI chatbot',
+                price: '$20/mo',
+                sub: 'General-purpose',
+                points: ['Just answers — doesn\'t teach', 'No flashcards, schedules, or tracking', 'Not aligned to school curriculum'],
+                dim: true,
+              },
+              {
+                icon: Zap,
+                title: 'Tutor AI',
+                price: 'From $0/mo',
+                sub: 'Built for school',
+                points: ['Available 24/7, every subject', 'Teaches with hints & steps, not just answers', 'Aligned to your state\'s curriculum'],
+                dim: false,
+              },
+            ].map((c, i) => {
+              const Icon = c.icon
+              return (
+                <ScrollReveal key={c.title} direction="up" delay={i * 90}>
+                  <div className={`rounded-3xl p-6 h-full flex flex-col ${
+                    c.dim
+                      ? 'glass opacity-80'
+                      : 'bg-electric-gradient text-white shadow-electric-xl relative overflow-hidden'
+                  }`}>
+                    {!c.dim && <div className="absolute inset-0 bg-glass-shine pointer-events-none" />}
+                    <div className="relative">
+                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center mb-4 ${
+                        c.dim ? 'bg-gray-500/10 text-gray-500' : 'bg-white/20 text-white'
+                      }`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <h3 className={`font-bold mb-1 ${c.dim ? 'text-gray-700' : 'text-white'}`}>{c.title}</h3>
+                      <p className={`text-2xl font-extrabold mb-0.5 ${c.dim ? 'text-gray-900' : 'text-white'}`}>{c.price}</p>
+                      <p className={`text-xs mb-4 ${c.dim ? 'text-gray-400' : 'text-blue-200'}`}>{c.sub}</p>
+                      <ul className="space-y-2">
+                        {c.points.map((p) => (
+                          <li key={p} className={`flex items-start gap-2 text-xs leading-relaxed ${c.dim ? 'text-gray-500' : 'text-blue-50'}`}>
+                            {c.dim
+                              ? <X className="w-3.5 h-3.5 shrink-0 mt-0.5 text-gray-300" />
+                              : <Check className="w-3.5 h-3.5 shrink-0 mt-0.5 text-blue-200" strokeWidth={2.5} />}
+                            {p}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              )
+            })}
           </div>
-        </section>
-      </ScrollReveal>
+        </div>
+      </section>
 
       {/* ── AI Features ──────────────────────────────── */}
       <section className="py-24 px-4 sm:px-6">
@@ -314,6 +341,40 @@ export default function LandingPage() {
               )
             })}
           </div>
+        </div>
+      </section>
+
+      {/* ── Curriculum callout ───────────────────────── */}
+      <section className="py-10 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <ScrollReveal direction="scale">
+            <div className="glass rounded-3xl p-8 sm:p-10 relative overflow-hidden">
+              <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-rose-500/10 blur-3xl pointer-events-none" />
+              <div className="flex flex-col sm:flex-row items-start gap-6 relative">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-lg shadow-rose-200 shrink-0">
+                  <MapPin className="w-7 h-7" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                    The only AI tutor that knows <span className="text-gradient">your state&apos;s curriculum</span>
+                  </h2>
+                  <p className="text-gray-500 text-sm leading-relaxed mb-4">
+                    Tell Tutor AI your county and grade, and every study guide aligns to what you&apos;re
+                    actually tested on — Virginia SOL, Texas TEKS &amp; STAAR, Florida BEST &amp; FAST,
+                    New York Regents, Common Core, NGSS, and standards for all 50 states. Practice
+                    questions even mirror your state test&apos;s format.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {['Virginia SOL', 'Texas TEKS', 'Florida BEST', 'NY Regents', 'Common Core', 'NGSS', '+ 45 more states'].map((s) => (
+                      <span key={s} className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
+                        {s}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -352,6 +413,42 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Teachers & Schools ───────────────────────── */}
+      <section className="py-16 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <ScrollReveal direction="scale">
+            <div className="glass-blue rounded-3xl p-8 sm:p-10">
+              <div className="flex flex-col sm:flex-row items-start gap-6">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-indigo-200 shrink-0">
+                  <Building2 className="w-7 h-7" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-3">Built for teachers &amp; districts too</h2>
+                  <div className="grid sm:grid-cols-3 gap-4 mb-5">
+                    {[
+                      { title: 'Teacher Hub', desc: 'Create classes, post assignments, share invite codes, import rosters.' },
+                      { title: 'Admin Dashboard', desc: 'District stats, bulk enrollment via CSV, Lightspeed MDM import.' },
+                      { title: 'District Pro', desc: 'Centralized billing, SSO, and dedicated support for schools.' },
+                    ].map((f) => (
+                      <div key={f.title}>
+                        <p className="text-sm font-bold text-gray-900 mb-1">{f.title}</p>
+                        <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <a
+                    href="mailto:learn.studyhub.team@gmail.com?subject=District Inquiry"
+                    className="inline-flex items-center gap-1.5 text-sm text-electric font-semibold hover:underline"
+                  >
+                    <Mail className="w-4 h-4" /> Talk to us about your school or district →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* ── Streak callout ───────────────────────────── */}
       <section className="py-16 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto">
@@ -371,39 +468,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── AI Model Comparison ───────────────────────── */}
-      <section className="py-16 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto">
-          <ScrollReveal direction="scale">
-            <div className="glass-blue rounded-3xl p-8 text-center">
-              <div className="inline-flex items-center gap-2 bg-electric/10 text-electric text-xs font-bold px-3 py-1.5 rounded-full mb-4">
-                <Brain className="w-3.5 h-3.5" />
-                AI Models
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-                Better plan = smarter AI
-              </h2>
-              <p className="text-gray-500 mb-8">
-                Free and Plus use Claude Haiku — fast and capable. Pro upgrades to Claude Sonnet for deeper reasoning.
-              </p>
-              <div className="grid sm:grid-cols-2 gap-4 text-left">
-                <div className="glass rounded-2xl p-5">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Free &amp; Plus</p>
-                  <p className="font-bold text-gray-900 mb-1">Claude Haiku</p>
-                  <p className="text-sm text-gray-500">Fast, capable AI tutor. Great for most topics and study sessions.</p>
-                </div>
-                <div className="glass rounded-2xl p-5 ring-2 ring-electric/30 relative overflow-hidden">
-                  <div className="absolute top-3 right-3 text-xs font-bold px-2 py-0.5 rounded-full glass-blue text-electric">Pro</div>
-                  <p className="text-xs font-bold text-electric uppercase tracking-wide mb-3">Pro</p>
-                  <p className="font-bold text-gray-900 mb-1">Claude Sonnet</p>
-                  <p className="text-sm text-gray-500">Our most advanced model. Deeper reasoning, nuanced explanations, superior at complex topics.</p>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
-
       {/* ── Pricing ──────────────────────────────────── */}
       <section className="py-24 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
@@ -412,7 +476,7 @@ export default function LandingPage() {
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
                 Simple, honest pricing
               </h2>
-              <p className="text-gray-500 text-lg">Free to start. Upgrade when you want more.</p>
+              <p className="text-gray-500 text-lg">Free to start. Upgrade when you want more. Save 35%+ with annual billing.</p>
             </div>
           </ScrollReveal>
           <div className="grid sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -443,6 +507,11 @@ export default function LandingPage() {
                             /{plan.period}
                           </span>
                         </div>
+                        {plan.annualNote && (
+                          <p className={`text-xs font-semibold mb-1 ${plan.highlight ? 'text-blue-100' : 'text-emerald-600'}`}>
+                            {plan.annualNote}
+                          </p>
+                        )}
                         <p className={`text-sm ${plan.highlight ? 'text-blue-100' : 'text-gray-500'}`}>
                           {plan.description}
                         </p>
@@ -464,12 +533,10 @@ export default function LandingPage() {
                           </li>
                         ))}
                         {plan.name === 'Free' && (
-                          <>
-                            <li className="flex items-start gap-2.5 text-sm">
-                              <X className="w-4 h-4 shrink-0 mt-0.5 text-gray-300" />
-                              <span className="text-gray-400">AI schedule &amp; guide generation</span>
-                            </li>
-                          </>
+                          <li className="flex items-start gap-2.5 text-sm">
+                            <X className="w-4 h-4 shrink-0 mt-0.5 text-gray-300" />
+                            <span className="text-gray-400">AI schedule &amp; guide generation</span>
+                          </li>
                         )}
                       </ul>
                     </div>
@@ -492,19 +559,52 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Final CTA ────────────────────────────────── */}
+      <section className="py-16 px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto">
+          <ScrollReveal direction="scale">
+            <div className="bg-electric-gradient rounded-3xl p-10 text-center text-white relative overflow-hidden shadow-electric-xl">
+              <div className="absolute inset-0 bg-glass-shine pointer-events-none" />
+              <div className="relative">
+                <h2 className="text-3xl font-extrabold mb-3">Start learning smarter tonight</h2>
+                <p className="text-blue-100 mb-7 max-w-md mx-auto">
+                  Free forever plan. No credit card. Your first AI tutoring session is 60 seconds away.
+                </p>
+                <Link
+                  href="/signup"
+                  className="bg-white text-electric font-bold px-8 py-4 rounded-2xl inline-flex items-center gap-2 hover:bg-blue-50 transition-colors shadow-lg"
+                >
+                  Create your free account <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* ── Footer ───────────────────────────────────── */}
       <ScrollReveal direction="fade">
         <footer className="border-t border-white/60 py-10 px-4 sm:px-6">
-          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-lg bg-electric-gradient flex items-center justify-center shadow-electric">
-                <Zap className="w-3.5 h-3.5 text-white" fill="white" />
+          <div className="max-w-6xl mx-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
+              <Link href="/" className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-lg bg-electric-gradient flex items-center justify-center shadow-electric">
+                  <Zap className="w-3.5 h-3.5 text-white" fill="white" />
+                </div>
+                <span className="text-sm font-bold text-gradient">Tutor AI</span>
+              </Link>
+              <div className="flex items-center gap-5 text-sm text-gray-400">
+                <Link href="/privacy" className="hover:text-gray-700 transition-colors">Privacy</Link>
+                <Link href="/terms" className="hover:text-gray-700 transition-colors">Terms</Link>
+                <a href="mailto:learn.studyhub.team@gmail.com" className="hover:text-gray-700 transition-colors">Support</a>
               </div>
-              <span className="text-sm font-bold text-gradient">Tutor AI</span>
-            </Link>
-            <p className="text-sm text-gray-400">
-              © {new Date().getFullYear()} Tutor AI. Built to help people learn.
-            </p>
+            </div>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400">
+              <p>© {new Date().getFullYear()} Tutor AI. Built to help people learn.</p>
+              <p className="flex items-center gap-1">
+                <Shield className="w-3 h-3" /> Payments secured by Stripe
+              </p>
+            </div>
           </div>
         </footer>
       </ScrollReveal>

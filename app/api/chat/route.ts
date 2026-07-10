@@ -47,6 +47,28 @@ export async function POST(req: Request) {
     }
   }
 
+  // Enforce daily message limit (cost control + upgrade prompt)
+  if (limits.aiMessagesPerDay !== null) {
+    const startOfDay = new Date()
+    startOfDay.setHours(0, 0, 0, 0)
+    const { count: msgCount } = await supabase
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('role', 'user')
+      .gte('created_at', startOfDay.toISOString())
+    if ((msgCount ?? 0) >= limits.aiMessagesPerDay) {
+      return Response.json(
+        {
+          error: plan === 'free'
+            ? `You've used all ${limits.aiMessagesPerDay} free messages for today. Upgrade to Plus for a much higher limit, or come back tomorrow.`
+            : `Daily message limit reached (${limits.aiMessagesPerDay}). It resets at midnight — or upgrade to Pro for unlimited messages.`,
+        },
+        { status: 403 }
+      )
+    }
+  }
+
   const modelId = getModelForPlan(plan)
 
   const lastMessage = messages[messages.length - 1]

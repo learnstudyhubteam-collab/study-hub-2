@@ -7,9 +7,10 @@ interface Props {
   plan: 'plus' | 'pro'
   label: string
   className?: string
+  interval?: 'month' | 'year'
 }
 
-export default function CheckoutButton({ plan, label, className = '' }: Props) {
+export default function CheckoutButton({ plan, label, className = '', interval = 'month' }: Props) {
   const [loading, setLoading] = useState(false)
 
   async function handleUpgrade() {
@@ -18,7 +19,7 @@ export default function CheckoutButton({ plan, label, className = '' }: Props) {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, interval }),
       })
       if (!res.ok) throw new Error(await res.text())
       const { url } = await res.json()

@@ -141,6 +141,11 @@ export default function SignupPage() {
         <p className="text-center text-xs text-gray-400 mt-4">
           Free forever · No credit card required
         </p>
+        <p className="text-center text-xs text-gray-400 mt-2">
+          By signing up you agree to our{' '}
+          <Link href="/terms" className="text-electric hover:underline">Terms</Link> and{' '}
+          <Link href="/privacy" className="text-electric hover:underline">Privacy Policy</Link>.
+        </p>
       </div>
     </div>
   )
