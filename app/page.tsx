@@ -176,7 +176,7 @@ export default function LandingPage() {
 
           <p className="animate-fade-up delay-200 text-lg sm:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
             Unlimited AI tutoring, flashcards, curriculum-aligned study guides, and everything
-            else students need — for less than the cost of a single hour with a private tutor.
+            else students need to learn smarter — starting completely free.
           </p>
 
           <div className="animate-fade-up delay-300 flex flex-col sm:flex-row gap-3 justify-center mb-6">
@@ -225,22 +225,22 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Parents / value comparison ───────────────── */}
+      {/* ── Why students & families love it ──────────── */}
       <section className="py-20 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 bg-emerald-500/10 text-emerald-600 text-xs font-bold px-3 py-1.5 rounded-full mb-4">
-                <DollarSign className="w-3.5 h-3.5" /> For Parents
+                <DollarSign className="w-3.5 h-3.5" /> Why Tutor AI
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-                Private tutoring costs $60/hour.
+                Help whenever you need it.
                 <br className="hidden sm:block" />
-                <span className="text-gradient">This is $8/month.</span>
+                <span className="text-gradient-animated">Not just Tuesdays at 4.</span>
               </h2>
               <p className="text-gray-500 max-w-xl mx-auto text-lg">
-                Help with homework at 10pm. Exam prep on Sunday morning. Your student gets a
-                patient tutor whenever they need one — not just Tuesdays at 4.
+                Homework help at 10pm. Exam prep on Sunday morning. A patient tutor
+                that&apos;s always there — for every subject, at a price every family can afford.
               </p>
             </div>
           </ScrollReveal>
@@ -249,58 +249,51 @@ export default function LandingPage() {
             {[
               {
                 icon: Clock,
-                title: 'Private tutor',
-                price: '$240–480/mo',
-                sub: '1–2 hours per week',
-                points: ['Fixed weekly schedule', 'One subject at a time', 'Unavailable at 10pm before the test'],
-                dim: true,
+                title: 'Always available',
+                stat: '24/7',
+                sub: 'day or night',
+                gradient: 'from-blue-500 to-indigo-600',
+                shadow: 'shadow-blue-200',
+                points: ['No appointments, no scheduling', 'There the night before the test', 'As many questions as you want'],
               },
               {
-                icon: Brain,
-                title: 'Generic AI chatbot',
-                price: '$20/mo',
-                sub: 'General-purpose',
-                points: ['Just answers — doesn\'t teach', 'No flashcards, schedules, or tracking', 'Not aligned to school curriculum'],
-                dim: true,
+                icon: BookOpen,
+                title: 'Every subject',
+                stat: 'All-in-1',
+                sub: 'one platform',
+                gradient: 'from-violet-500 to-fuchsia-500',
+                shadow: 'shadow-violet-200',
+                points: ['Math, science, English, history +', 'Teaches with hints and steps', 'Aligned to your state\'s curriculum'],
               },
               {
                 icon: Zap,
-                title: 'Tutor AI',
-                price: 'From $0/mo',
-                sub: 'Built for school',
-                points: ['Available 24/7, every subject', 'Teaches with hints & steps, not just answers', 'Aligned to your state\'s curriculum'],
-                dim: false,
+                title: 'Family-friendly price',
+                stat: 'From $0',
+                sub: 'free forever plan',
+                gradient: 'from-emerald-500 to-teal-500',
+                shadow: 'shadow-emerald-200',
+                points: ['Start free, no credit card', 'Plus is just $8/month', 'Cancel anytime'],
               },
             ].map((c, i) => {
               const Icon = c.icon
               return (
                 <ScrollReveal key={c.title} direction="up" delay={i * 90}>
-                  <div className={`rounded-3xl p-6 h-full flex flex-col ${
-                    c.dim
-                      ? 'glass opacity-80'
-                      : 'bg-electric-gradient text-white shadow-electric-xl relative overflow-hidden'
-                  }`}>
-                    {!c.dim && <div className="absolute inset-0 bg-glass-shine pointer-events-none" />}
-                    <div className="relative">
-                      <div className={`w-10 h-10 rounded-2xl flex items-center justify-center mb-4 ${
-                        c.dim ? 'bg-gray-500/10 text-gray-500' : 'bg-white/20 text-white'
-                      }`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <h3 className={`font-bold mb-1 ${c.dim ? 'text-gray-700' : 'text-white'}`}>{c.title}</h3>
-                      <p className={`text-2xl font-extrabold mb-0.5 ${c.dim ? 'text-gray-900' : 'text-white'}`}>{c.price}</p>
-                      <p className={`text-xs mb-4 ${c.dim ? 'text-gray-400' : 'text-blue-200'}`}>{c.sub}</p>
-                      <ul className="space-y-2">
-                        {c.points.map((p) => (
-                          <li key={p} className={`flex items-start gap-2 text-xs leading-relaxed ${c.dim ? 'text-gray-500' : 'text-blue-50'}`}>
-                            {c.dim
-                              ? <X className="w-3.5 h-3.5 shrink-0 mt-0.5 text-gray-300" />
-                              : <Check className="w-3.5 h-3.5 shrink-0 mt-0.5 text-blue-200" strokeWidth={2.5} />}
-                            {p}
-                          </li>
-                        ))}
-                      </ul>
+                  <div className="glass-card p-6 h-full flex flex-col relative overflow-hidden group">
+                    <div className={`absolute -top-10 -right-10 w-32 h-32 rounded-full bg-gradient-to-br ${c.gradient} opacity-10 blur-2xl group-hover:opacity-20 transition-opacity pointer-events-none`} />
+                    <div className={`w-11 h-11 rounded-2xl bg-gradient-to-br ${c.gradient} flex items-center justify-center mb-4 text-white shadow-lg ${c.shadow} group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className="w-5 h-5" />
                     </div>
+                    <p className="text-3xl font-black text-gray-900 leading-none mb-0.5">{c.stat}</p>
+                    <p className="text-xs text-gray-400 mb-1">{c.sub}</p>
+                    <h3 className="font-bold text-gray-900 mb-3">{c.title}</h3>
+                    <ul className="space-y-2">
+                      {c.points.map((p) => (
+                        <li key={p} className="flex items-start gap-2 text-xs leading-relaxed text-gray-500">
+                          <Check className="w-3.5 h-3.5 shrink-0 mt-0.5 text-emerald-500" strokeWidth={2.5} />
+                          {p}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </ScrollReveal>
               )
@@ -310,7 +303,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── AI Features ──────────────────────────────── */}
-      <section className="py-24 px-4 sm:px-6">
+      <section className="py-24 px-4 sm:px-6 bg-gradient-to-b from-transparent via-violet-200/25 to-transparent">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
@@ -379,7 +372,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Platform Features ────────────────────────── */}
-      <section className="py-16 px-4 sm:px-6 bg-gradient-to-b from-transparent to-blue-50/30">
+      <section className="py-16 px-4 sm:px-6 bg-gradient-to-b from-transparent via-cyan-200/25 to-transparent">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
@@ -469,7 +462,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Pricing ──────────────────────────────────── */}
-      <section className="py-24 px-4 sm:px-6">
+      <section className="py-24 px-4 sm:px-6 bg-gradient-to-b from-transparent via-pink-200/20 to-transparent">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
