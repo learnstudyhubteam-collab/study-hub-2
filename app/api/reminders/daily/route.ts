@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/server'
 import { sendDailyDigest } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
@@ -7,13 +7,14 @@ export const dynamic = 'force-dynamic'
 interface ExamRow { user_id: string; title: string; subject: string | null; exam_date: string }
 interface AssignmentRow { user_id: string; title: string; subject: string | null; due_date: string; priority: string }
 
-export async function POST(req: NextRequest) {
+async function handleDailyDigest(req: NextRequest) {
   const auth = req.headers.get('authorization')
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (!process.env.CRON_SECRET || auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const supabase = await createClient()
+  // Service role: a cron has no user session, so RLS would hide every row
+  const supabase = await createAdminClient()
 
   const now = new Date()
   const in3Days = new Date(now)
@@ -75,4 +76,13 @@ export async function POST(req: NextRequest) {
   }
 
   return Response.json({ sent, errors })
+}
+
+// Vercel crons invoke with GET; keep POST for manual triggering
+export async function GET(req: NextRequest) {
+  return handleDailyDigest(req)
+}
+
+export async function POST(req: NextRequest) {
+  return handleDailyDigest(req)
 }

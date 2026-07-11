@@ -117,3 +117,39 @@ export async function sendDailyDigest({
     html: baseTemplate('Tutor AI Daily Digest', `You have ${total} upcoming deadline${total !== 1 ? 's' : ''}`, body),
   })
 }
+
+export async function sendStreakSaver({
+  to,
+  name,
+  streak,
+  freezes,
+}: {
+  to: string
+  name: string
+  streak: number
+  freezes: number
+}) {
+  const firstName = name?.split(' ')[0] || 'there'
+
+  const body = `
+    <h1>🔥 Your ${streak}-day streak ends at midnight, ${firstName}!</h1>
+    <p>You&rsquo;ve studied <strong>${streak} day${streak !== 1 ? 's' : ''} in a row</strong> — that&rsquo;s real momentum. One quick lesson keeps the chain alive.</p>
+    <div class="item" style="border-left-color:#F97316;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <span class="item-title">Complete any lesson before midnight</span>
+        <span class="badge badge-amber">~3 min</span>
+      </div>
+      <p class="item-meta">A single Learn Mode lesson, flashcard review, or AI tutor session counts.</p>
+    </div>
+    ${freezes > 0
+      ? `<p style="font-size:13px;">Safety net: you have <strong>${freezes} streak freeze${freezes !== 1 ? 's' : ''}</strong> — it&rsquo;ll be used automatically if you miss today.</p>`
+      : `<p style="font-size:13px;">No streak freezes left — this one&rsquo;s on you! (You can buy freezes with rubies in the Ruby Shop.)</p>`}
+  `
+
+  await getResend().emails.send({
+    from: FROM,
+    to,
+    subject: `🔥 Your ${streak}-day streak ends at midnight`,
+    html: baseTemplate('Streak Saver', `Don't lose your ${streak}-day streak`, body),
+  })
+}

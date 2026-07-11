@@ -4,6 +4,10 @@
     {
       "path": "/api/reminders/daily",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/reminders/streak",
+      "schedule": "0 22 * * *"
     }
   ]
 }

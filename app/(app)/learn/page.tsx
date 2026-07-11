@@ -2,7 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { subjects } from '@/lib/learn-content'
-import { Flame, Gem, BookOpen, Star, Target } from 'lucide-react'
+import { getUserPlan } from '@/lib/tier'
+import { Flame, Gem, BookOpen, Star, Target, Sparkles } from 'lucide-react'
 import ScrollReveal from '@/components/ui/scroll-reveal'
 
 export const dynamic = 'force-dynamic'
@@ -19,11 +20,19 @@ export default async function LearnPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [{ data: profile }, { data: progressRows }, { data: streakData }] = await Promise.all([
+  const startOfDay = new Date()
+  startOfDay.setHours(0, 0, 0, 0)
+
+  const [{ data: profile }, { data: progressRows }, { data: streakData }, plan, { count: todayCount }] = await Promise.all([
     supabase.from('profiles').select('full_name, rubies, streak_freeze_count').eq('id', user.id).single(),
     supabase.from('learn_progress').select('subject, xp, lessons_completed, level, placement_done').eq('user_id', user.id),
     supabase.from('study_activity').select('activity_date').eq('user_id', user.id).order('activity_date', { ascending: false }).limit(30),
+    getUserPlan(),
+    supabase.from('learn_completions').select('id', { count: 'exact', head: true }).eq('user_id', user.id).gte('completed_at', startOfDay.toISOString()),
   ])
+
+  const FREE_LESSONS_PER_DAY = 2
+  const lessonsLeftToday = plan === 'free' ? Math.max(0, FREE_LESSONS_PER_DAY - (todayCount ?? 0)) : null
 
   const progressMap = Object.fromEntries((progressRows ?? []).map((p) => [p.subject, p]))
 
@@ -58,6 +67,35 @@ export default async function LearnPage() {
           </Link>
         </div>
       </ScrollReveal>
+
+      {/* Free-plan daily lesson meter */}
+      {lessonsLeftToday !== null && (
+        <ScrollReveal>
+          <div className={`glass rounded-2xl px-5 py-4 flex items-center gap-4 border ${lessonsLeftToday === 0 ? 'border-violet-200' : 'border-white/60'}`}>
+            <div className="flex gap-1.5">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-3 h-3 rounded-full ${i < 2 - lessonsLeftToday ? 'bg-gradient-to-br from-violet-500 to-fuchsia-500' : 'bg-gray-200'}`}
+                />
+              ))}
+            </div>
+            <p className="text-sm text-gray-600 flex-1">
+              {lessonsLeftToday > 0 ? (
+                <><strong className="text-gray-900">{lessonsLeftToday} free lesson{lessonsLeftToday !== 1 ? 's' : ''}</strong> left today</>
+              ) : (
+                <>You&apos;ve used today&apos;s free lessons — replays are always free</>
+              )}
+            </p>
+            <Link
+              href="/billing"
+              className="text-xs font-semibold text-violet-600 hover:text-violet-800 transition-colors inline-flex items-center gap-1 shrink-0"
+            >
+              <Sparkles className="w-3.5 h-3.5" /> Go unlimited
+            </Link>
+          </div>
+        </ScrollReveal>
+      )}
 
       <ScrollReveal delay={0.05}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

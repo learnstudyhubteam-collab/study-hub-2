@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('subscription_plan, subscription_status')
+    .select('subscription_plan, subscription_status, bonus_ai_sessions')
     .eq('id', user.id)
     .single()
 
@@ -30,8 +30,9 @@ export async function POST(req: Request) {
   const plan = (status === 'active' ? (profile?.subscription_plan ?? 'free') : 'free') as SubscriptionPlan
   const limits = PLAN_LIMITS[plan]
 
-  // Enforce free-tier session limit
+  // Enforce free-tier session limit (base + rubies-purchased bonus sessions)
   if (limits.aiSessionsPerMonth !== null) {
+    const allowance = limits.aiSessionsPerMonth + (profile?.bonus_ai_sessions ?? 0)
     const startOfMonth = new Date()
     startOfMonth.setDate(1); startOfMonth.setHours(0, 0, 0, 0)
     const { count } = await supabase
@@ -39,9 +40,9 @@ export async function POST(req: Request) {
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
       .gte('created_at', startOfMonth.toISOString())
-    if ((count ?? 0) >= limits.aiSessionsPerMonth) {
+    if ((count ?? 0) >= allowance) {
       return Response.json(
-        { error: `Free plan allows ${limits.aiSessionsPerMonth} AI sessions per month. Upgrade to continue.` },
+        { error: `You've used all ${allowance} AI sessions this month. Upgrade for unlimited — or earn rubies in Learn Mode and buy bonus sessions in the Ruby Shop.` },
         { status: 403 }
       )
     }

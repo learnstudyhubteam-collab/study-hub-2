@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getUserPlan } from '@/lib/tier'
 import RubyShop from '@/components/learn/RubyShop'
 import { Gem, Flame } from 'lucide-react'
 import ScrollReveal from '@/components/ui/scroll-reveal'
@@ -11,11 +12,14 @@ export default async function ShopPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('rubies, streak_freeze_count, full_name')
-    .eq('id', user.id)
-    .single()
+  const [{ data: profile }, plan] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('rubies, streak_freeze_count, full_name, bonus_ai_sessions')
+      .eq('id', user.id)
+      .single(),
+    getUserPlan(),
+  ])
 
   return (
     <div className="space-y-8 max-w-2xl mx-auto">
@@ -54,6 +58,8 @@ export default async function ShopPage() {
           userId={user.id}
           currentRubies={profile?.rubies ?? 0}
           currentFreezes={profile?.streak_freeze_count ?? 0}
+          currentBonusSessions={profile?.bonus_ai_sessions ?? 0}
+          isPaid={plan === 'plus' || plan === 'pro'}
         />
       </ScrollReveal>
     </div>
