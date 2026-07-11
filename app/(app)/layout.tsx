@@ -17,10 +17,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ])
 
   const needsOnboarding = !profile?.onboarding_completed
+  const role = (profile?.role ?? 'student') as 'student' | 'teacher' | 'admin'
 
   return (
     <div className="min-h-screen flex">
-      <Sidebar plan={plan} role={profile?.role ?? null} />
+      <Sidebar plan={plan} role={role} />
       <div className="flex-1 flex flex-col min-w-0">
         <main className="flex-1 px-4 sm:px-6 py-8 max-w-5xl w-full mx-auto pb-24 lg:pb-8">
           {children}

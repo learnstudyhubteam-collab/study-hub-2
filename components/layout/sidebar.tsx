@@ -7,15 +7,16 @@ import {
   Zap, LayoutDashboard, BookOpen, Layers, CreditCard, LogOut,
   GraduationCap, ClipboardList, Calculator, Clock, CalendarClock,
   Users, FileText, Menu, X, Sparkles, Settings, Command, Link2, Sigma,
-  Building2, Shield,
+  Shield, Monitor, Megaphone, BarChart3, AlertTriangle,
+  Trophy, Gem, MessageSquareHeart,
 } from 'lucide-react'
 import { useState } from 'react'
 import PomodoroTimer from '@/components/layout/PomodoroTimer'
 
 import type { SubscriptionPlan } from '@/lib/tier'
-interface SidebarProps { plan?: SubscriptionPlan; role?: string | null }
+interface SidebarProps { plan?: SubscriptionPlan; role?: 'student' | 'teacher' | 'admin' }
 
-const navGroups = [
+const studentNavGroups = [
   {
     label: 'General',
     color: 'text-blue-500',
@@ -52,6 +53,98 @@ const navGroups = [
     ],
   },
   {
+    label: 'Learn',
+    color: 'text-pink-500',
+    items: [
+      { href: '/learn', label: 'Learn Mode', icon: Trophy },
+      { href: '/shop', label: 'Ruby Shop', icon: Gem },
+      { href: '/feedback', label: 'Feedback', icon: MessageSquareHeart },
+    ],
+  },
+  {
+    label: 'Tools',
+    color: 'text-orange-500',
+    items: [
+      { href: '/calculator', label: 'Calculator', icon: Sigma },
+    ],
+  },
+]
+
+const teacherNavGroups = [
+  {
+    label: 'Teacher',
+    color: 'text-violet-500',
+    items: [
+      { href: '/teacher', label: 'Teacher Dashboard', icon: GraduationCap },
+      { href: '/monitor', label: 'Screen Monitor', icon: Monitor },
+      { href: '/overdue', label: 'Overdue Items', icon: AlertTriangle },
+    ],
+  },
+  {
+    label: 'Classroom',
+    color: 'text-blue-500',
+    items: [
+      { href: '/classes', label: 'My Classes', icon: BookOpen },
+      { href: '/assignments', label: 'Assignments', icon: ClipboardList },
+      { href: '/grades', label: 'Grades', icon: BarChart3 },
+    ],
+  },
+  {
+    label: 'Students',
+    color: 'text-emerald-500',
+    items: [
+      { href: '/groups', label: 'Study Groups', icon: Users },
+      { href: '/exams', label: 'Exams', icon: Clock },
+    ],
+  },
+  {
+    label: 'Learn',
+    color: 'text-pink-500',
+    items: [
+      { href: '/learn', label: 'Learn Mode', icon: Trophy },
+      { href: '/shop', label: 'Ruby Shop', icon: Gem },
+      { href: '/feedback', label: 'Feedback', icon: MessageSquareHeart },
+    ],
+  },
+  {
+    label: 'Tools',
+    color: 'text-orange-500',
+    items: [
+      { href: '/calculator', label: 'Calculator', icon: Sigma },
+    ],
+  },
+]
+
+const adminNavGroups = [
+  {
+    label: 'Admin',
+    color: 'text-red-500',
+    items: [
+      { href: '/admin', label: 'Admin Dashboard', icon: Shield },
+      { href: '/admin/users', label: 'User Management', icon: Users },
+      { href: '/monitor', label: 'Screen Monitor', icon: Monitor },
+      { href: '/overdue', label: 'Overdue Items', icon: AlertTriangle },
+    ],
+  },
+  {
+    label: 'School',
+    color: 'text-violet-500',
+    items: [
+      { href: '/admin/announcements/new', label: 'Announcements', icon: Megaphone },
+      { href: '/classes', label: 'All Classes', icon: GraduationCap },
+      { href: '/assignments', label: 'Assignments', icon: ClipboardList },
+    ],
+  },
+  {
+    label: 'Learn',
+    color: 'text-pink-500',
+    items: [
+      { href: '/learn', label: 'Learn Mode', icon: Trophy },
+      { href: '/shop', label: 'Ruby Shop', icon: Gem },
+      { href: '/admin/feedback', label: 'View Feedback', icon: MessageSquareHeart },
+    ],
+  },
+  {
     label: 'Tools',
     color: 'text-orange-500',
     items: [
@@ -72,10 +165,9 @@ function openCommandPalette() {
   window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true, bubbles: true }))
 }
 
-export default function Sidebar({ plan = 'free', role }: SidebarProps) {
+export default function Sidebar({ plan = 'free', role = 'student' }: SidebarProps) {
   const isPaid = plan === 'plus' || plan === 'pro'
-  const isTeacher = role === 'teacher' || role === 'admin'
-  const isAdmin = role === 'admin'
+  const navGroups = role === 'admin' ? adminNavGroups : role === 'teacher' ? teacherNavGroups : studentNavGroups
   const pathname = usePathname()
   const router = useRouter()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -95,7 +187,14 @@ export default function Sidebar({ plan = 'free', role }: SidebarProps) {
           <div className="w-8 h-8 rounded-xl bg-electric-gradient flex items-center justify-center shadow-electric group-hover:shadow-electric-lg transition-all">
             <Zap className="w-4 h-4 text-white" fill="white" />
           </div>
-          <span className="text-base font-bold text-gradient">Tutor AI</span>
+          <div>
+            <span className="text-base font-bold text-gradient">Tutor AI</span>
+            {role !== 'student' && (
+              <div className={`text-[9px] font-bold uppercase tracking-widest leading-none ${role === 'admin' ? 'text-red-500' : 'text-violet-500'}`}>
+                {role}
+              </div>
+            )}
+          </div>
         </Link>
       </div>
 
@@ -142,69 +241,6 @@ export default function Sidebar({ plan = 'free', role }: SidebarProps) {
           </div>
         ))}
 
-        {/* Educator section — teachers and admins */}
-        {isTeacher && (
-          <div>
-            <p className="text-[10px] font-bold text-indigo-500 uppercase tracking-widest px-2 mb-1.5">
-              Educator
-            </p>
-            <div className="space-y-0.5">
-              {[
-                { href: '/teacher', label: 'Teacher Hub', icon: GraduationCap },
-              ].map((item) => {
-                const active = pathname === item.href || pathname.startsWith(item.href + '/')
-                const Icon = item.icon
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      active
-                        ? 'bg-indigo-500/10 text-indigo-600 shadow-[inset_0_0_0_1px_rgba(99,102,241,0.15)]'
-                        : 'text-gray-500 hover:text-gray-900 hover:bg-black/5'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-indigo-500' : ''}`} />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* District Admin section */}
-        {isAdmin && (
-          <div>
-            <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest px-2 mb-1.5">
-              District Admin
-            </p>
-            <div className="space-y-0.5">
-              {[
-                { href: '/admin', label: 'Admin Dashboard', icon: Building2 },
-              ].map((item) => {
-                const active = pathname === item.href || pathname.startsWith(item.href + '/')
-                const Icon = item.icon
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    onClick={() => setMobileOpen(false)}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      active
-                        ? 'bg-blue-500/10 text-blue-600 shadow-[inset_0_0_0_1px_rgba(59,130,246,0.15)]'
-                        : 'text-gray-500 hover:text-gray-900 hover:bg-black/5'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 shrink-0 ${active ? 'text-blue-500' : ''}`} />
-                    {item.label}
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
-        )}
       </nav>
 
       {/* Pomodoro Timer */}
