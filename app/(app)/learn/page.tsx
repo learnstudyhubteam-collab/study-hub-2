@@ -22,7 +22,7 @@ export default async function LearnPage() {
   const [{ data: profile }, { data: progressRows }, { data: streakData }] = await Promise.all([
     supabase.from('profiles').select('full_name, rubies, streak_freeze_count').eq('id', user.id).single(),
     supabase.from('learn_progress').select('subject, xp, lessons_completed, level, placement_done').eq('user_id', user.id),
-    supabase.from('study_activities').select('activity_date').eq('user_id', user.id).order('activity_date', { ascending: false }).limit(30),
+    supabase.from('study_activity').select('activity_date').eq('user_id', user.id).order('activity_date', { ascending: false }).limit(30),
   ])
 
   const progressMap = Object.fromEntries((progressRows ?? []).map((p) => [p.subject, p]))

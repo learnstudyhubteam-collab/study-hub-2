@@ -70,7 +70,7 @@ export default function LessonQuiz({ subject, lesson, userId, alreadyCompleted }
                 return supabase.from('profiles').update({ rubies: current + rubiesEarned }).eq('id', userId)
               })
             : Promise.resolve(),
-          supabase.from('study_activities').upsert(
+          supabase.from('study_activity').upsert(
             { user_id: userId, activity_date: new Date().toISOString().split('T')[0] },
             { onConflict: 'user_id,activity_date' }
           ),

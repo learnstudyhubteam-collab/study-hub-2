@@ -46,7 +46,7 @@ export default async function ScreenMonitorPage() {
       .order('updated_at', { ascending: false })
       .limit(50),
     supabase
-      .from('study_activities')
+      .from('study_activity')
       .select('user_id, activity_date')
       .eq('activity_date', todayStr),
   ])

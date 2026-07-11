@@ -57,7 +57,7 @@ export default function PlacementTest({ subject, userId }: Props) {
       },
       { onConflict: 'user_id,subject' }
     )
-    await supabase.from('study_activities').upsert(
+    await supabase.from('study_activity').upsert(
       { user_id: userId, activity_date: new Date().toISOString().split('T')[0] },
       { onConflict: 'user_id,activity_date' }
     )
