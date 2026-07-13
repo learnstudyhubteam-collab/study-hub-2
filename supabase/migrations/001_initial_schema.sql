@@ -1,5 +1,5 @@
 -- ============================================================
--- Study Hub — Initial Schema
+-- Tutor AI — Initial Schema
 -- ============================================================
 
 -- Profiles (extends auth.users)

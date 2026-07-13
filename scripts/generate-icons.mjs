@@ -73,7 +73,7 @@ function splashSvg(w, h) {
     </g>
   </g>
   <!-- App name below icon -->
-  <text x="${cx}" y="${cy + iconSize * 0.75}" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-weight="800" font-size="${iconSize * 0.18}" fill="#0066FF">Study Hub</text>
+  <text x="${cx}" y="${cy + iconSize * 0.75}" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-weight="800" font-size="${iconSize * 0.18}" fill="#0066FF">Tutor AI</text>
   <text x="${cx}" y="${cy + iconSize * 0.95}" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Inter', sans-serif" font-weight="500" font-size="${iconSize * 0.10}" fill="#6B7280">AI-Powered Learning</text>
 </svg>`
 }

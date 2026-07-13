@@ -1,5 +1,5 @@
 -- ============================================================
--- Study Hub — Admin & Teacher Features
+-- Tutor AI — Admin & Teacher Features
 -- ============================================================
 
 -- Add role and school fields to profiles if not present
