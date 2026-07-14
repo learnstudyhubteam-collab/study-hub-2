@@ -38,6 +38,7 @@ const countBadgeColors: Record<AssignmentStatus | 'all', string> = {
 export default function AssignmentsPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [loading, setLoading] = useState(true)
+  const [viewerId, setViewerId] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [filter, setFilter] = useState<AssignmentStatus | 'all'>('all')
   const [saving, setSaving] = useState(false)
@@ -56,7 +57,8 @@ export default function AssignmentsPage() {
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('assignments').select('*').eq('user_id', user.id).order('due_date', { ascending: true, nullsFirst: false })
+    const { data } = await supabase.from('assignments').select('*').order('due_date', { ascending: true, nullsFirst: false })
+    setViewerId(user.id)
     setAssignments((data ?? []) as Assignment[])
     setLoading(false)
   }
@@ -244,6 +246,9 @@ export default function AssignmentsPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 mt-1 flex-wrap">
+                      {viewerId && a.user_id !== viewerId && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100">From your class</span>
+                      )}
                       {a.subject && (
                         <span className="text-xs font-medium text-electric bg-electric/8 px-2 py-0.5 rounded-full">{a.subject}</span>
                       )}

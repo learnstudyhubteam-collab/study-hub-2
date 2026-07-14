@@ -8,7 +8,7 @@ import {
   Plus, X, Copy, Check, Clock
 } from 'lucide-react'
 import Link from 'next/link'
-import type { ClassRow, Assignment, AssignmentStatus, AssignmentPriority } from '@/types'
+import type { ClassRow, Assignment, AssignmentStatus, AssignmentPriority, StudyGuide } from '@/types'
 
 interface Member {
   user_id: string
@@ -24,6 +24,8 @@ export default function ClassDetailPage({ params }: PageProps) {
   const [role, setRole] = useState<'student' | 'teacher'>('student')
   const [members, setMembers] = useState<Member[]>([])
   const [assignments, setAssignments] = useState<Assignment[]>([])
+  const [guides, setGuides] = useState<StudyGuide[]>([])
+  const [expandedGuide, setExpandedGuide] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'stream' | 'classwork' | 'people'>('stream')
   const [showCreateAssignment, setShowCreateAssignment] = useState(false)
@@ -45,11 +47,12 @@ export default function ClassDetailPage({ params }: PageProps) {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
-    const [{ data: profile }, { data: classData }, { data: membersData }, { data: assignmentsData }] = await Promise.all([
+    const [{ data: profile }, { data: classData }, { data: membersData }, { data: assignmentsData }, { data: guidesData }] = await Promise.all([
       supabase.from('profiles').select('role').eq('id', user.id).single(),
       supabase.from('classes').select('*').eq('id', classId).single(),
       supabase.from('class_members').select('user_id, joined_at, profiles(full_name, email)').eq('class_id', classId),
       supabase.from('assignments').select('*').eq('class_id', classId).order('due_date', { ascending: true, nullsFirst: false }),
+      supabase.from('study_guides').select('*').eq('class_id', classId).order('created_at', { ascending: false }),
     ])
 
     if (!classData) { router.push('/classes'); return }
@@ -57,6 +60,7 @@ export default function ClassDetailPage({ params }: PageProps) {
     setCls(classData as ClassRow)
     setMembers((membersData ?? []) as unknown as Member[])
     setAssignments((assignmentsData ?? []) as Assignment[])
+    setGuides((guidesData ?? []) as StudyGuide[])
     setLoading(false)
   }
 
@@ -171,6 +175,33 @@ export default function ClassDetailPage({ params }: PageProps) {
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${statusColors[a.status]}`}>{a.status}</span>
             </div>
           ))}
+
+          {/* Shared study guides */}
+          {guides.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-amber-600 uppercase tracking-widest px-1">Study Guides</p>
+              {guides.map((g) => (
+                <div key={g.id} className="glass-card overflow-hidden">
+                  <div
+                    className="p-4 flex items-center gap-3 cursor-pointer hover:bg-electric/5 transition-colors"
+                    onClick={() => setExpandedGuide(expandedGuide === g.id ? null : g.id)}
+                  >
+                    <BookOpen className="w-4 h-4 text-amber-500 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 truncate">{g.title}</p>
+                      {g.subject && <p className="text-xs text-electric mt-0.5">{g.subject}</p>}
+                    </div>
+                    <span className="text-xs text-gray-400">{expandedGuide === g.id ? 'Hide' : 'Read'}</span>
+                  </div>
+                  {expandedGuide === g.id && (
+                    <div className="px-5 pb-6 border-t border-white/40">
+                      <div className="pt-4 whitespace-pre-wrap text-sm text-gray-700 leading-relaxed">{g.content}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { FileText, Sparkles, X, ChevronDown, Trash2, BookOpen } from 'lucide-react'
+import { FileText, Sparkles, X, ChevronDown, Trash2, BookOpen, GraduationCap } from 'lucide-react'
 import type { StudyGuide } from '@/types'
 import Link from 'next/link'
 
@@ -18,6 +18,9 @@ export default function GuidesPage() {
   const [subject, setSubject] = useState('')
   const [gradeLevel, setGradeLevel] = useState('')
   const [extraContext, setExtraContext] = useState('')
+  const [classId, setClassId] = useState('')
+  const [myClasses, setMyClasses] = useState<{ id: string; name: string }[]>([])
+  const [userId, setUserId] = useState<string | null>(null)
 
   const supabase = createClient()
 
@@ -26,8 +29,14 @@ export default function GuidesPage() {
   async function load() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
-    const { data } = await supabase.from('study_guides').select('*').eq('user_id', user.id).order('created_at', { ascending: false })
+    setUserId(user.id)
+    // RLS scopes this to own guides + guides shared with the user's classes
+    const [{ data }, { data: classes }] = await Promise.all([
+      supabase.from('study_guides').select('*').order('created_at', { ascending: false }),
+      supabase.from('classes').select('id, name').eq('teacher_id', user.id),
+    ])
     setGuides((data ?? []) as StudyGuide[])
+    setMyClasses((classes ?? []) as { id: string; name: string }[])
     setLoading(false)
   }
 
@@ -38,12 +47,12 @@ export default function GuidesPage() {
       const res = await fetch('/api/guides/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ topic, subject: subject || null, gradeLevel: gradeLevel || null, extraContext }),
+        body: JSON.stringify({ topic, subject: subject || null, gradeLevel: gradeLevel || null, extraContext, classId: classId || null }),
       })
       if (!res.ok) throw new Error(await res.text())
       const guide = await res.json() as StudyGuide
       setGuides((p) => [guide, ...p])
-      setTopic(''); setSubject(''); setGradeLevel(''); setExtraContext('')
+      setTopic(''); setSubject(''); setGradeLevel(''); setExtraContext(''); setClassId('')
       setShowCreate(false); setExpanded(guide.id)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to generate guide')
@@ -100,6 +109,16 @@ export default function GuidesPage() {
                   <input placeholder="High school, AP, College" value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} className="input-glass w-full px-3 py-2 rounded-xl text-sm" />
                 </div>
               </div>
+              {myClasses.length > 0 && (
+                <div>
+                  <label className="text-xs text-gray-500 mb-1 block">Share with a class (optional)</label>
+                  <select value={classId} onChange={(e) => setClassId(e.target.value)} className="input-glass w-full px-3 py-2 rounded-xl text-sm">
+                    <option value="">Just for me</option>
+                    {myClasses.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                  <p className="text-[11px] text-gray-400 mt-1">Shared guides appear for every student in the class.</p>
+                </div>
+              )}
               <div>
                 <label className="text-xs text-gray-500 mb-1 block">Extra context (optional)</label>
                 <textarea placeholder="e.g. Focus on light-dependent reactions. Include diagrams as text art." value={extraContext} onChange={(e) => setExtraContext(e.target.value)} rows={2} className="input-glass w-full px-4 py-2.5 rounded-xl text-sm resize-none" />
@@ -156,12 +175,19 @@ export default function GuidesPage() {
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs text-gray-400">{new Date(g.created_at).toLocaleDateString()}</span>
                     {g.subject && <span className="text-xs text-electric">{g.subject}</span>}
+                    {userId && g.user_id !== userId && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100 inline-flex items-center gap-0.5">
+                        <GraduationCap className="w-2.5 h-2.5" /> From your class
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={(e) => { e.stopPropagation(); deleteGuide(g.id) }} className="text-gray-300 hover:text-red-400 transition-colors p-1">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  {userId && g.user_id === userId && (
+                    <button onClick={(e) => { e.stopPropagation(); deleteGuide(g.id) }} className="text-gray-300 hover:text-red-400 transition-colors p-1">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  )}
                   <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${expanded === g.id ? 'rotate-180' : ''}`} />
                 </div>
               </div>

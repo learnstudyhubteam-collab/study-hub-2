@@ -172,7 +172,7 @@ function getCurriculumContext(
 
 // ── Route handler ─────────────────────────────────────────────────────────────
 export async function POST(req: Request) {
-  const { topic, subject, gradeLevel, extraContext } = await req.json()
+  const { topic, subject, gradeLevel, extraContext, classId } = await req.json()
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -222,11 +222,24 @@ Use clear headings, bullet points, and examples.
 Tailor the complexity and vocabulary to the specified grade level.`,
   })
 
+  // Optional class share: only allowed for the class's own teacher
+  let shareClassId: string | null = null
+  if (classId) {
+    const { data: ownedClass } = await supabase
+      .from('classes')
+      .select('id')
+      .eq('id', classId)
+      .eq('teacher_id', user.id)
+      .maybeSingle()
+    shareClassId = ownedClass?.id ?? null
+  }
+
   const { data, error } = await supabase.from('study_guides').insert({
     user_id: user.id,
     title: topic,
     content: text,
     subject: subject || null,
+    class_id: shareClassId,
   }).select('*').single()
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
