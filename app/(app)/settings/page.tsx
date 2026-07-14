@@ -16,10 +16,11 @@ interface LocalProfile {
   classes: string[] | null
 }
 
+// Administrator is not self-serve: admins are promoted by an existing
+// admin from /admin/users (the profiles trigger enforces this server-side)
 const ROLES: { value: Role; label: string; desc: string }[] = [
   { value: 'student', label: 'Student', desc: 'Track grades, assignments & study sessions' },
   { value: 'teacher', label: 'Teacher', desc: 'Create classes, assign work & monitor progress' },
-  { value: 'admin', label: 'Administrator', desc: 'Manage district, schools & staff accounts' },
 ]
 
 const GRADE_LEVELS = [
@@ -75,7 +76,8 @@ export default function SettingsPage() {
     const classes = classesInput.split(',').map((s) => s.trim()).filter(Boolean)
     await supabase.from('profiles').update({
       full_name: fullName || null,
-      role,
+      // Admins keep their role; role changes for others go through /admin/users
+      ...(profile?.role === 'admin' ? {} : { role }),
       school: school || null,
       grade_level: gradeLevel || null,
       county: county || null,
@@ -191,6 +193,12 @@ export default function SettingsPage() {
           <h2 className="font-bold text-gray-900 flex items-center gap-2 text-sm">
             <GraduationCap className="w-4 h-4 text-electric" /> Role
           </h2>
+          {profile?.role === 'admin' && (
+            <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-blue-50 border border-blue-200">
+              <Building2 className="w-4 h-4 text-blue-600 shrink-0" />
+              <p className="text-sm font-semibold text-blue-700">You&apos;re a district administrator</p>
+            </div>
+          )}
           <div className="grid grid-cols-1 gap-2.5">
             {ROLES.map((r) => (
               <button
@@ -245,7 +253,7 @@ export default function SettingsPage() {
             </h3>
             <ul className="space-y-2 text-xs text-gray-600">
               <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">→</span> Contact <strong>learn.studyhub.team@gmail.com</strong> to set up district-wide bulk enrollment.</li>
-              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">→</span> Ask about <strong>Pro district plans</strong> with centralized billing, admin dashboards, and SSO.</li>
+              <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">→</span> Ask about <strong>district plans</strong> with centralized billing, admin dashboards, and SSO.</li>
               <li className="flex items-start gap-2"><span className="text-blue-500 font-bold mt-0.5">→</span> Teachers in your district can sign up individually with the school email domain.</li>
             </ul>
           </div>

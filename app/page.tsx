@@ -71,17 +71,17 @@ const platformFeatures = [
 
 const pricing = [
   {
-    name: 'Free',
+    name: 'Spark',
     price: '$0',
     period: 'forever',
     annualNote: null,
     description: 'Everything you need to get started.',
-    model: 'Claude Haiku',
-    modelNote: 'Fast, capable AI',
+    model: 'Spark Engine',
+    modelNote: 'Fast everyday tutor',
     features: [
       '5 AI tutor sessions / month',
       '25 AI messages / day',
-      'Up to 2 flashcard decks',
+      '2 Learn Mode lessons / day',
       'Classes, groups & assignments',
       'Grade calculator & exam tracker',
     ],
@@ -91,41 +91,41 @@ const pricing = [
     badge: null,
   },
   {
-    name: 'Plus',
-    price: '$8',
+    name: 'Scholar',
+    price: '$7.99',
     period: 'per month',
     annualNote: 'or $59/year (save 38%)',
-    description: 'Unlimited AI for focused learners.',
-    model: 'Claude Haiku',
-    modelNote: 'Unlimited sessions',
+    description: 'A smarter AI for focused learners.',
+    model: 'Scholar Engine',
+    modelNote: 'Advanced reasoning AI',
     features: [
+      'Advanced reasoning AI engine',
       'Unlimited AI tutor sessions',
       '300 AI messages / day',
-      'Unlimited flashcard decks',
-      'AI study schedules & guides',
-      'AI flashcard generation',
+      'Unlimited lessons, decks & guides',
+      'AI schedules & flashcard generation',
     ],
-    cta: 'Start Plus',
+    cta: 'Start Scholar',
     href: '/signup',
     highlight: false,
     badge: 'Most popular',
   },
   {
-    name: 'Pro',
-    price: '$15',
+    name: 'Sage',
+    price: '$19.99',
     period: 'per month',
-    annualNote: 'or $119/year (save 34%)',
+    annualNote: 'or $149/year (save 38%)',
     description: 'Our most powerful AI for serious students.',
-    model: 'Claude Sonnet',
-    modelNote: 'Most capable AI model',
+    model: 'Sage Engine',
+    modelNote: 'Our most powerful AI',
     features: [
-      'Everything in Plus',
-      'Unlimited daily messages',
-      'Advanced Claude Sonnet AI',
-      'Deeper reasoning & explanations',
+      'Everything in Scholar',
+      'Our most powerful AI engine',
+      '500 AI messages / day',
+      'Best for AP, SAT & hard subjects',
       'Priority support',
     ],
-    cta: 'Start Pro',
+    cta: 'Start Sage',
     href: '/signup',
     highlight: true,
     badge: null,
@@ -272,7 +272,7 @@ export default function LandingPage() {
                 sub: 'free forever plan',
                 gradient: 'from-emerald-500 to-teal-500',
                 shadow: 'shadow-emerald-200',
-                points: ['Start free, no credit card', 'Plus is just $8/month', 'Cancel anytime'],
+                points: ['Start free, no credit card', 'Scholar is just $7.99/month', 'Cancel anytime'],
               },
             ].map((c, i) => {
               const Icon = c.icon
@@ -421,7 +421,7 @@ export default function LandingPage() {
                     {[
                       { title: 'Teacher Hub', desc: 'Create classes, post assignments, share invite codes, import rosters.' },
                       { title: 'Admin Dashboard', desc: 'District stats, bulk enrollment via CSV, Lightspeed MDM import.' },
-                      { title: 'District Pro', desc: 'Centralized billing, SSO, and dedicated support for schools.' },
+                      { title: 'District Plans', desc: 'Centralized billing, SSO, and dedicated support for schools.' },
                     ].map((f) => (
                       <div key={f.title}>
                         <p className="text-sm font-bold text-gray-900 mb-1">{f.title}</p>
@@ -525,7 +525,7 @@ export default function LandingPage() {
                             <span className={plan.highlight ? 'text-white' : 'text-gray-700'}>{feature}</span>
                           </li>
                         ))}
-                        {plan.name === 'Free' && (
+                        {plan.name === 'Spark' && (
                           <li className="flex items-start gap-2.5 text-sm">
                             <X className="w-4 h-4 shrink-0 mt-0.5 text-gray-300" />
                             <span className="text-gray-400">AI schedule &amp; guide generation</span>

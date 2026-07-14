@@ -27,7 +27,7 @@ export async function POST(req: Request) {
   const limits = PLAN_LIMITS[plan]
 
   if (!limits.aiFlashcardGen) {
-    return Response.json({ error: 'AI flashcard generation requires a Plus or Pro plan.' }, { status: 403 })
+    return Response.json({ error: 'AI flashcard generation requires a Scholar or Sage plan.' }, { status: 403 })
   }
 
   const modelId = getModelForPlan(plan)

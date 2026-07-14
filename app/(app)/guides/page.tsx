@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { FileText, Sparkles, X, ChevronDown, Trash2, BookOpen } from 'lucide-react'
 import type { StudyGuide } from '@/types'
+import Link from 'next/link'
 
 export default function GuidesPage() {
   const [guides, setGuides] = useState<StudyGuide[]>([])
@@ -103,7 +104,16 @@ export default function GuidesPage() {
                 <label className="text-xs text-gray-500 mb-1 block">Extra context (optional)</label>
                 <textarea placeholder="e.g. Focus on light-dependent reactions. Include diagrams as text art." value={extraContext} onChange={(e) => setExtraContext(e.target.value)} rows={2} className="input-glass w-full px-4 py-2.5 rounded-xl text-sm resize-none" />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
+              {error && (
+                <div className="text-sm glass rounded-xl px-3 py-2.5 space-y-1.5">
+                  <p className="text-red-500">{error}</p>
+                  {error.includes('plan') && (
+                    <Link href="/billing" className="inline-flex items-center gap-1 text-electric font-semibold text-xs hover:underline">
+                      <Sparkles className="w-3 h-3" /> See plans — Scholar is $7.99/mo →
+                    </Link>
+                  )}
+                </div>
+              )}
               <button type="submit" disabled={generating || !topic.trim()} className="btn-electric text-white w-full py-3 rounded-xl font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2">
                 {generating ? (
                   <>

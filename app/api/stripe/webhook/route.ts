@@ -4,12 +4,18 @@ import type Stripe from 'stripe'
 
 export const runtime = 'nodejs'
 
-const PLUS_PRICE_ID = process.env.STRIPE_PRICE_ID_PLUS
-const PRO_PRICE_ID = process.env.STRIPE_PRICE_ID_PRO
+const PLUS_PRICE_IDS = [
+  process.env.STRIPE_PRICE_ID_PLUS,
+  process.env.STRIPE_PRICE_ID_PLUS_ANNUAL,
+].filter(Boolean)
+const PRO_PRICE_IDS = [
+  process.env.STRIPE_PRICE_ID_PRO,
+  process.env.STRIPE_PRICE_ID_PRO_ANNUAL,
+].filter(Boolean)
 
 function planFromPriceId(priceId: string | null | undefined): 'plus' | 'pro' {
-  if (priceId && PLUS_PRICE_ID && priceId === PLUS_PRICE_ID) return 'plus'
-  if (priceId && PRO_PRICE_ID && priceId === PRO_PRICE_ID) return 'pro'
+  if (priceId && PRO_PRICE_IDS.includes(priceId)) return 'pro'
+  if (priceId && PLUS_PRICE_IDS.includes(priceId)) return 'plus'
   // Unknown price ID — default to plus (least privilege)
   return 'plus'
 }

@@ -417,10 +417,10 @@ Questions? Reply to this email.
         )}
       </div>
 
-      {/* District Pro Plan */}
+      {/* District Plan */}
       <div className="glass rounded-2xl p-5 border border-blue-100">
         <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2 mb-3">
-          <Shield className="w-4 h-4 text-blue-500" /> District Pro Plan
+          <Shield className="w-4 h-4 text-blue-500" /> District Plan
         </h2>
         <ul className="space-y-2 text-xs text-gray-600 mb-4">
           <li className="flex items-start gap-2">
@@ -445,10 +445,10 @@ Questions? Reply to this email.
           </li>
         </ul>
         <a
-          href="mailto:learn.studyhub.team@gmail.com?subject=District Pro Plan Inquiry"
+          href="mailto:learn.studyhub.team@gmail.com?subject=District Plan Inquiry"
           className="btn-electric text-white text-xs font-semibold px-5 py-2.5 rounded-xl inline-flex items-center gap-1.5"
         >
-          <Mail className="w-3.5 h-3.5" /> Contact us about District Pro
+          <Mail className="w-3.5 h-3.5" /> Contact us about District plans
         </a>
       </div>
 

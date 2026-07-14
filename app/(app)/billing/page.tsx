@@ -24,9 +24,9 @@ export default async function BillingPage() {
   const currentPlan = isActive ? plan : 'free'
 
   const planDetails = {
-    free: { name: 'Free', price: '$0', period: 'forever', color: 'text-gray-900', bg: 'glass' },
-    plus: { name: 'Plus', price: '$8', period: 'per month', color: 'text-violet-600', bg: 'bg-violet-500/8' },
-    pro: { name: 'Pro', price: '$15', period: 'per month', color: 'text-electric', bg: 'bg-electric/8' },
+    free: { name: 'Spark', price: '$0', period: 'forever', color: 'text-gray-900', bg: 'glass' },
+    plus: { name: 'Scholar', price: '$7.99', period: 'per month', color: 'text-violet-600', bg: 'bg-violet-500/8' },
+    pro: { name: 'Sage', price: '$19.99', period: 'per month', color: 'text-electric', bg: 'bg-electric/8' },
   }
 
   const current = planDetails[currentPlan]
@@ -74,14 +74,14 @@ export default async function BillingPage() {
           <Brain className={`w-5 h-5 shrink-0 ${isActive ? 'text-white/80' : 'text-electric'}`} />
           <div>
             <p className={`text-sm font-bold ${isActive ? 'text-white' : 'text-gray-900'}`}>
-              {currentPlan === 'pro' ? 'Claude Sonnet' : 'Claude Haiku'}
+              {currentPlan === 'pro' ? 'Sage Engine' : currentPlan === 'plus' ? 'Scholar Engine' : 'Spark Engine'}
             </p>
             <p className={`text-xs ${isActive ? 'text-white/60' : 'text-gray-500'}`}>
               {currentPlan === 'pro'
-                ? 'Most capable model — deeper reasoning, richer explanations'
+                ? 'Our most powerful AI — deepest reasoning, richest explanations'
                 : currentPlan === 'plus'
-                ? 'Fast, capable model — unlimited access'
-                : 'Fast, capable model — 5 sessions/month'}
+                ? 'Advanced reasoning AI — unlimited sessions'
+                : 'Fast everyday tutor — 5 sessions/month'}
             </p>
           </div>
         </div>
@@ -100,10 +100,10 @@ export default async function BillingPage() {
       {isActive && currentPlan === 'plus' && (
         <div className="glass rounded-2xl p-5 space-y-3">
           <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-            <Crown className="w-4 h-4 text-electric" /> Upgrade to Pro for Claude Sonnet
+            <Crown className="w-4 h-4 text-electric" /> Upgrade to Sage for our most powerful AI
           </h2>
-          <p className="text-xs text-gray-500">Get access to the most capable Claude model with deeper reasoning and richer explanations.</p>
-          <CheckoutButton plan="pro" label="Upgrade to Pro — $15/month" className="btn-electric text-white" />
+          <p className="text-xs text-gray-500">The Sage Engine gives the deepest reasoning and richest explanations — best for AP, SAT, and the hardest subjects.</p>
+          <CheckoutButton plan="pro" label="Upgrade to Sage — $19.99/month" className="btn-electric text-white" />
         </div>
       )}
     </div>

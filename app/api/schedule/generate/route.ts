@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   const limits = PLAN_LIMITS[plan]
 
   if (!limits.aiScheduleGen) {
-    return Response.json({ error: 'AI schedule generation requires a Plus or Pro plan.' }, { status: 403 })
+    return Response.json({ error: 'AI schedule generation requires a Scholar or Sage plan.' }, { status: 403 })
   }
 
   const modelId = getModelForPlan(plan)

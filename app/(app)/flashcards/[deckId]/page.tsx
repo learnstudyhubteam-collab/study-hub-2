@@ -3,6 +3,7 @@
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { toast } from '@/lib/toast'
 import Button from '@/components/ui/button'
 import Input from '@/components/ui/input'
 import { Layers, Plus, X, Zap, RotateCcw, Check, ChevronLeft, ChevronRight, Sparkles, RefreshCw } from 'lucide-react'
@@ -127,6 +128,10 @@ export default function DeckPage({ params }: PageProps) {
       if (Array.isArray(newCards)) {
         setCards((prev) => [...prev, ...newCards])
         setGenTopic('')
+      } else if (res.status === 403) {
+        toast(newCards?.error ?? 'AI generation requires a Scholar or Sage plan.', 'error')
+      } else if (newCards?.error) {
+        toast(newCards.error, 'error')
       }
     } finally {
       setGenerating(false)

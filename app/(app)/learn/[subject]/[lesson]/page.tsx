@@ -60,7 +60,7 @@ export default async function LessonPage({
             </h1>
             <p className="text-sm text-gray-500 leading-relaxed">
               Nice work — you completed {FREE_LESSONS_PER_DAY} lessons today. Free accounts
-              get {FREE_LESSONS_PER_DAY} new lessons a day. Upgrade to Plus for unlimited
+              get {FREE_LESSONS_PER_DAY} new lessons a day. Upgrade to Scholar for unlimited
               lessons, or come back tomorrow to keep your streak going.
             </p>
           </div>
@@ -69,7 +69,7 @@ export default async function LessonPage({
               href="/billing"
               className="btn-electric text-white px-5 py-2.5 rounded-xl text-sm font-semibold inline-flex items-center justify-center gap-1.5"
             >
-              <Sparkles className="w-4 h-4" /> Unlock unlimited — $8/mo
+              <Sparkles className="w-4 h-4" /> Unlock unlimited — $7.99/mo
             </Link>
             <Link
               href="/learn"

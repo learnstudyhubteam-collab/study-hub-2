@@ -188,7 +188,7 @@ export async function POST(req: Request) {
   const limits = PLAN_LIMITS[plan]
 
   if (!limits.aiGuideGen) {
-    return Response.json({ error: 'AI study guide generation requires a Plus or Pro plan.' }, { status: 403 })
+    return Response.json({ error: 'AI study guide generation requires a Scholar or Sage plan.' }, { status: 403 })
   }
 
   const modelId = getModelForPlan(plan)

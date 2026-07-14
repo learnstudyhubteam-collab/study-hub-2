@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
 
 export async function POST(req: Request) {
@@ -46,7 +46,9 @@ export async function POST(req: Request) {
       metadata: { supabase_user_id: user.id },
     })
     customerId = customer.id
-    await supabase.from('profiles').update({ stripe_customer_id: customerId }).eq('id', user.id)
+    // Service role: stripe_customer_id is a protected column (see profiles trigger)
+    const admin = await createAdminClient()
+    await admin.from('profiles').update({ stripe_customer_id: customerId }).eq('id', user.id)
   }
 
   const session = await stripe.checkout.sessions.create({

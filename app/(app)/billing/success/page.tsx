@@ -20,14 +20,14 @@ export default function BillingSuccessPage() {
         </h1>
         <p className="text-gray-500 text-sm leading-relaxed mb-3">
           Your subscription is active. You now have access to{' '}
-          <strong className="text-electric">Claude Sonnet</strong>, our most advanced AI model.
+          <strong className="text-electric">a more powerful AI engine</strong> with deeper reasoning.
         </p>
 
         <div className="glass-blue rounded-2xl p-4 mb-7 text-left">
           <p className="text-xs font-bold text-electric uppercase tracking-widest mb-2">What you unlocked</p>
           <ul className="space-y-1.5">
             {[
-              'Claude Sonnet — deeper, more nuanced AI',
+              'A smarter AI engine — deeper, more nuanced help',
               'Richer explanations and reasoning',
               'Better performance on complex topics',
             ].map((item) => (

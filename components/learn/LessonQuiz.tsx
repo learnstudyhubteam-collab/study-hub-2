@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import type { Subject, Lesson } from '@/lib/learn-content'
 import { CheckCircle2, XCircle, ChevronLeft, Gem, Star, Flame, RotateCcw } from 'lucide-react'
 
@@ -42,39 +41,28 @@ export default function LessonQuiz({ subject, lesson, userId, alreadyCompleted }
     if (isLast) {
       const finalCorrect = correctCount + (selected === q.correct ? 1 : 0)
       const score = Math.round((finalCorrect / lesson.questions.length) * 100)
-      const xpEarned = alreadyCompleted ? 0 : lesson.xp
-      const rubiesEarned = alreadyCompleted ? 0 : (score >= 60 ? lesson.rubies : 0)
 
       setSaving(true)
       setFinished(true)
-      setRewards({ xp: xpEarned, rubies: rubiesEarned, score })
+      // Optimistic display; the server computes the authoritative rewards
+      setRewards({
+        xp: alreadyCompleted ? 0 : lesson.xp,
+        rubies: alreadyCompleted ? 0 : (score >= 60 ? lesson.rubies : 0),
+        score,
+      })
 
-      if (!alreadyCompleted) {
-        const supabase = createClient()
-        await Promise.all([
-          supabase.from('learn_completions').upsert({
-            user_id: userId,
-            subject: subject.id,
-            lesson_id: lesson.id,
-            score,
-            xp_earned: xpEarned,
-            rubies_earned: rubiesEarned,
-          }),
-          supabase.from('learn_progress').upsert(
-              { user_id: userId, subject: subject.id, xp: xpEarned, lessons_completed: 1 },
-              { onConflict: 'user_id,subject' }
-            ),
-          xpEarned > 0 || rubiesEarned > 0
-            ? supabase.from('profiles').select('rubies').eq('id', userId).single().then(({ data }) => {
-                const current = data?.rubies ?? 0
-                return supabase.from('profiles').update({ rubies: current + rubiesEarned }).eq('id', userId)
-              })
-            : Promise.resolve(),
-          supabase.from('study_activity').upsert(
-            { user_id: userId, activity_date: new Date().toISOString().split('T')[0] },
-            { onConflict: 'user_id,activity_date' }
-          ),
-        ])
+      try {
+        const res = await fetch('/api/learn/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ subjectId: subject.id, lessonId: lesson.id, score }),
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setRewards({ xp: data.xp, rubies: data.rubies, score: data.score })
+        }
+      } catch {
+        // Rewards display stays optimistic; server will reconcile on next load
       }
       setSaving(false)
     } else {

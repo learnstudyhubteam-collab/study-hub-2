@@ -95,13 +95,13 @@ export default function ChatInterface({
           <h2 className="font-bold text-gray-900 text-sm truncate">{topic}</h2>
           {!isPro ? (
             <p className="text-xs text-gray-400 mt-0.5">
-              Standard AI (Claude Haiku) ·{' '}
+              Spark Engine (fast everyday AI) ·{' '}
               <a href="/billing" className="text-electric hover:text-electric-dark font-medium transition-colors">
-                Upgrade for Claude Sonnet <ArrowUpRight className="w-3 h-3 inline" />
+                Upgrade for a smarter engine <ArrowUpRight className="w-3 h-3 inline" />
               </a>
             </p>
           ) : (
-            <p className="text-xs text-electric mt-0.5 font-medium">Claude Sonnet (Pro model)</p>
+            <p className="text-xs text-electric mt-0.5 font-medium">Premium engine — deeper reasoning</p>
           )}
         </div>
         {isPro && (

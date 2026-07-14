@@ -59,6 +59,8 @@ export default function OnboardingModal({ show }: Props) {
     }
     setOpen(false)
     setSaving(false)
+    // Land new users in Learn Mode so their first minute has a guided action
+    window.location.href = '/learn'
   }
 
   function dismiss() {

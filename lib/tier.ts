@@ -4,6 +4,27 @@ import { AI_MODELS } from '@/lib/models'
 export type SubscriptionStatus = 'free' | 'active' | 'canceled' | 'past_due'
 export type SubscriptionPlan = 'free' | 'plus' | 'pro'
 
+// Customer-facing plan branding. Internal keys stay free/plus/pro (DB check
+// constraint + Stripe metadata); these are the only names users should see.
+export const PLAN_NAMES: Record<SubscriptionPlan, string> = {
+  free: 'Spark',
+  plus: 'Scholar',
+  pro: 'Sage',
+}
+
+// Customer-facing AI engine names (map to Claude Haiku/Sonnet/Opus internally)
+export const ENGINE_NAMES: Record<SubscriptionPlan, string> = {
+  free: 'Spark Engine',
+  plus: 'Scholar Engine',
+  pro: 'Sage Engine',
+}
+
+export const PLAN_PRICES: Record<SubscriptionPlan, { monthly: string; annual: string | null }> = {
+  free: { monthly: '$0', annual: null },
+  plus: { monthly: '$7.99', annual: '$59' },
+  pro: { monthly: '$19.99', annual: '$149' },
+}
+
 export interface PlanLimits {
   aiSessionsPerMonth: number | null  // null = unlimited
   aiMessagesPerDay: number | null    // null = unlimited
@@ -32,7 +53,7 @@ export const PLAN_LIMITS: Record<SubscriptionPlan, PlanLimits> = {
   },
   pro: {
     aiSessionsPerMonth: null,
-    aiMessagesPerDay: null,
+    aiMessagesPerDay: 500, // fair-use ceiling — Opus-tier output is expensive
     flashcardDecks: null,
     aiScheduleGen: true,
     aiGuideGen: true,

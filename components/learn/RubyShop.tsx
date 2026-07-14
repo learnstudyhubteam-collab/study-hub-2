@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { Shield, Gem, Brain } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -80,33 +79,30 @@ export default function RubyShop({ userId, currentRubies, currentFreezes, curren
     if (rubies < item.cost) return
     setBuying(item.id)
 
-    const supabase = createClient()
-    const newRubies = rubies - item.cost
-    const newFreezes = freezes + item.freezeCount
-    const newBonus = bonusSessions + item.bonusSessions
-
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        rubies: newRubies,
-        streak_freeze_count: newFreezes,
-        bonus_ai_sessions: newBonus,
+    try {
+      const res = await fetch('/api/shop/purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId: item.id }),
       })
-      .eq('id', userId)
+      const data = await res.json()
 
-    if (error) {
+      if (!res.ok) {
+        setToast({ msg: data.error ?? 'Purchase failed — try again.', ok: false })
+      } else {
+        setRubies(data.rubies)
+        setFreezes(data.streak_freeze_count)
+        setBonusSessions(data.bonus_ai_sessions)
+        setToast({
+          msg: item.bonusSessions > 0
+            ? `Bought ${item.label}! You now get ${5 + data.bonus_ai_sessions} AI sessions every month.`
+            : `Bought ${item.label}! You now have ${data.streak_freeze_count} freeze${data.streak_freeze_count !== 1 ? 's' : ''}.`,
+          ok: true,
+        })
+        router.refresh()
+      }
+    } catch {
       setToast({ msg: 'Purchase failed — try again.', ok: false })
-    } else {
-      setRubies(newRubies)
-      setFreezes(newFreezes)
-      setBonusSessions(newBonus)
-      setToast({
-        msg: item.bonusSessions > 0
-          ? `Bought ${item.label}! You now get ${5 + newBonus} AI sessions every month.`
-          : `Bought ${item.label}! You now have ${newFreezes} freeze${newFreezes !== 1 ? 's' : ''}.`,
-        ok: true,
-      })
-      router.refresh()
     }
 
     setBuying(null)

@@ -13,7 +13,7 @@ export default function UpgradeBanner() {
           <div>
             <p className="font-bold text-white">Unlock full AI access</p>
             <p className="text-sm text-blue-100 mt-0.5">
-              Plus ($8/mo) for unlimited sessions · Pro ($15/mo) for Claude Sonnet AI.
+              Scholar ($7.99/mo) for advanced AI &amp; unlimited sessions · Sage ($19.99/mo) for our most powerful engine.
             </p>
           </div>
         </div>

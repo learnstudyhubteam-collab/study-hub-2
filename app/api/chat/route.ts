@@ -62,8 +62,8 @@ export async function POST(req: Request) {
       return Response.json(
         {
           error: plan === 'free'
-            ? `You've used all ${limits.aiMessagesPerDay} free messages for today. Upgrade to Plus for a much higher limit, or come back tomorrow.`
-            : `Daily message limit reached (${limits.aiMessagesPerDay}). It resets at midnight — or upgrade to Pro for unlimited messages.`,
+            ? `You've used all ${limits.aiMessagesPerDay} free messages for today. Upgrade to Scholar for a much higher limit, or come back tomorrow.`
+            : `Daily message limit reached (${limits.aiMessagesPerDay}). It resets at midnight — or upgrade to Sage for a higher limit.`,
         },
         { status: 403 }
       )

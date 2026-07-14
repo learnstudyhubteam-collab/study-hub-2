@@ -88,7 +88,7 @@ export default async function ScreenMonitorPage() {
                 : <GraduationCap className="w-4 h-4 text-violet-500" />
               }
               <span className={`text-xs font-bold uppercase tracking-widest ${profile?.role === 'admin' ? 'text-red-500' : 'text-violet-500'}`}>
-                {profile?.role === 'admin' ? 'Admin' : 'Teacher'} · Screen Monitor
+                {profile?.role === 'admin' ? 'Admin' : 'Teacher'} · Activity Monitor
               </span>
             </div>
             <h1 className="text-2xl font-bold text-gray-900">Student Activity Monitor</h1>

@@ -76,7 +76,7 @@ const teacherNavGroups = [
     color: 'text-violet-500',
     items: [
       { href: '/teacher', label: 'Teacher Dashboard', icon: GraduationCap },
-      { href: '/monitor', label: 'Screen Monitor', icon: Monitor },
+      { href: '/monitor', label: 'Activity Monitor', icon: Monitor },
       { href: '/overdue', label: 'Overdue Items', icon: AlertTriangle },
     ],
   },
@@ -122,7 +122,7 @@ const adminNavGroups = [
     items: [
       { href: '/admin', label: 'Admin Dashboard', icon: Shield },
       { href: '/admin/users', label: 'User Management', icon: Users },
-      { href: '/monitor', label: 'Screen Monitor', icon: Monitor },
+      { href: '/monitor', label: 'Activity Monitor', icon: Monitor },
       { href: '/overdue', label: 'Overdue Items', icon: AlertTriangle },
     ],
   },
@@ -255,7 +255,7 @@ export default function Sidebar({ plan = 'free', role = 'student' }: SidebarProp
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium text-electric bg-electric/8 hover:bg-electric/12 transition-colors"
           >
             <Sparkles className="w-4 h-4" />
-            {plan === 'pro' ? 'Pro plan active' : 'Plus plan active'}
+            {plan === 'pro' ? 'Sage plan active' : 'Scholar plan active'}
           </Link>
         ) : (
           <Link
@@ -264,7 +264,7 @@ export default function Sidebar({ plan = 'free', role = 'student' }: SidebarProp
             className="flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-semibold btn-electric text-white"
           >
             <Zap className="w-4 h-4" fill="white" />
-            Upgrade to Pro
+            Upgrade
           </Link>
         )}
         <Link
