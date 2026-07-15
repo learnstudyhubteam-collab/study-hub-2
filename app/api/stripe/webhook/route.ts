@@ -1,24 +1,9 @@
 import { stripe } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/server'
+import { planFromPriceId } from '@/lib/stripe-prices'
 import type Stripe from 'stripe'
 
 export const runtime = 'nodejs'
-
-const PLUS_PRICE_IDS = [
-  process.env.STRIPE_PRICE_ID_PLUS,
-  process.env.STRIPE_PRICE_ID_PLUS_ANNUAL,
-].filter(Boolean)
-const PRO_PRICE_IDS = [
-  process.env.STRIPE_PRICE_ID_PRO,
-  process.env.STRIPE_PRICE_ID_PRO_ANNUAL,
-].filter(Boolean)
-
-function planFromPriceId(priceId: string | null | undefined): 'plus' | 'pro' {
-  if (priceId && PRO_PRICE_IDS.includes(priceId)) return 'pro'
-  if (priceId && PLUS_PRICE_IDS.includes(priceId)) return 'plus'
-  // Unknown price ID — default to plus (least privilege)
-  return 'plus'
-}
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -78,7 +63,7 @@ export async function POST(req: Request) {
       const sub = event.data.object as Stripe.Subscription
       const status = sub.status === 'active' || sub.status === 'trialing' ? 'active' : sub.status
       const priceId = sub.items.data[0]?.price?.id
-      const plan = planFromPriceId(priceId)
+      const plan = await planFromPriceId(priceId)
       await updateSubscription(sub.customer as string, status, plan, sub.id)
       break
     }

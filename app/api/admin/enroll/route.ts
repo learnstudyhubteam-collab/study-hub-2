@@ -49,7 +49,7 @@ export async function POST(req: Request) {
           grade_level: u.grade_level ?? '',
           county: u.county ?? profile?.county ?? '',
         },
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? ''}/auth/callback`,
+        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL ?? 'https://tutorailearn.com'}/auth/callback`,
       })
       if (error) {
         results.push({ email: u.email, status: 'error', error: error.message })

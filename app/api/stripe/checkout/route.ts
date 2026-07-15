@@ -1,5 +1,6 @@
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { stripe } from '@/lib/stripe'
+import { resolvePriceId } from '@/lib/stripe-prices'
 
 export async function POST(req: Request) {
   const { plan = 'pro', interval = 'month' } = await req.json().catch(() => ({}))
@@ -11,20 +12,13 @@ export async function POST(req: Request) {
     return new Response('Invalid interval', { status: 400 })
   }
 
-  const priceMap: Record<string, string | undefined> = {
-    'plus:month': process.env.STRIPE_PRICE_ID_PLUS,
-    'pro:month': process.env.STRIPE_PRICE_ID_PRO,
-    'plus:year': process.env.STRIPE_PRICE_ID_PLUS_ANNUAL,
-    'pro:year': process.env.STRIPE_PRICE_ID_PRO_ANNUAL,
-  }
-  const priceId = priceMap[`${plan}:${interval}`]
-  if (!priceId) {
-    return new Response(
-      interval === 'year'
-        ? 'Annual pricing is not configured yet — set STRIPE_PRICE_ID_PLUS_ANNUAL and STRIPE_PRICE_ID_PRO_ANNUAL.'
-        : 'Stripe price IDs not configured',
-      { status: 500 }
-    )
+  // Env override → existing lookup_key price → auto-created price
+  let priceId: string
+  try {
+    priceId = await resolvePriceId(plan, interval)
+  } catch (err) {
+    console.error('Stripe price resolution failed:', err)
+    return new Response('Payments are not available right now — try again shortly.', { status: 500 })
   }
 
   const supabase = await createClient()

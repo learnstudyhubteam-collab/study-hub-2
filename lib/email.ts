@@ -1,6 +1,6 @@
 import { Resend } from 'resend'
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? 'Tutor AI <noreply@studyhub.app>'
+const FROM = process.env.RESEND_FROM_EMAIL ?? 'Tutor AI <noreply@tutorailearn.com>'
 
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY)
@@ -43,11 +43,11 @@ function baseTemplate(title: string, preheader: string, body: string) {
       <span class="logo-text">Tutor AI</span>
     </div>
     ${body}
-    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://study-hub-2.vercel.app'}/dashboard" class="btn">Open Tutor AI →</a>
+    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://tutorailearn.com'}/dashboard" class="btn">Open Tutor AI →</a>
   </div>
   <div class="footer">
     You&rsquo;re receiving this because you have upcoming deadlines.<br/>
-    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://study-hub-2.vercel.app'}/settings" style="color:#0066FF;">Manage notification settings</a>
+    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? 'https://tutorailearn.com'}/settings" style="color:#0066FF;">Manage notification settings</a>
   </div>
 </div>
 </body>

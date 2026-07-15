@@ -178,7 +178,7 @@ Hi,
 
 Your school district has set up Tutor AI for students and teachers.
 
-Please sign up at: ${process.env.NEXT_PUBLIC_APP_URL ?? 'https://tutorai.app'}/signup
+Please sign up at: ${process.env.NEXT_PUBLIC_APP_URL ?? 'https://tutorailearn.com'}/signup
 
 Tutor AI is an AI-powered learning platform with:
 • Personalized AI tutoring across all subjects
